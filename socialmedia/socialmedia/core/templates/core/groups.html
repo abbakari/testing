@@ -1,0 +1,1308 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups & Communities</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ZegoCloud SDK -->
+    <script src="https://zegocloud.github.io/zego_uikit_prebuilt_web/video_conference/index.js"></script>
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #f0f2f5;
+            --accent-color: #764ba2;
+        }
+    
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+        }
+    
+        /* Navigation */
+        .sidebar {
+            width: 280px;
+            transition: all 0.3s ease-in-out;
+        }
+    
+        .sidebar-collapsed {
+            width: 80px;
+        }
+    
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.5rem;
+        }
+    
+        .nav-item:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+    
+        .nav-item.active {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+        }
+    
+        /* Group Cards */
+        .group-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+    
+        .group-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    
+        .group-banner {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+    
+        .group-banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, white);
+        }
+    
+        .group-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            position: absolute;
+            bottom: -40px;
+            left: 1rem;
+            z-index: 10;
+        }
+    
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    
+        /* Modal Styles */
+        #create-group-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+    
+        #create-group-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    
+        .modal-container {
+            max-height: 90vh;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+    
+        .modal-content {
+            scrollbar-width: thin;
+        }
+    
+        /* Chat Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px);
+            background-color: var(--secondary-color);
+        }
+    
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+    
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+            background-repeat: repeat;
+        }
+    
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+    
+        .message.received {
+            justify-content: flex-start;
+        }
+    
+        .message.sent {
+            justify-content: flex-end;
+        }
+    
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1.125rem;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+    
+        .message.sent .message-bubble {
+            background: #dcf8c6;
+            border-bottom-right-radius: 0.25rem;
+        }
+    
+        .message.received .message-bubble {
+            background: white;
+            border-bottom-left-radius: 0.25rem;
+        }
+    
+        .message-time {
+            font-size: 0.6875rem;
+            color: #667781;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+    
+        .message.sent .message-time {
+            justify-content: flex-end;
+        }
+    
+        .message-status {
+            margin-left: 0.25rem;
+        }
+    
+        .message.sent .message-status {
+            color: #4fc3f7;
+        }
+    
+        .chat-input-container {
+            background: white;
+            padding: 0.625rem;
+            border-top: 1px solid #e9edef;
+            display: flex;
+            align-items: center;
+        }
+    
+        .chat-input {
+            flex: 1;
+            border: none;
+            border-radius: 1.25rem;
+            padding: 0.625rem 1rem;
+            background: #f0f2f5;
+            margin: 0 0.5rem;
+            outline: none;
+        }
+    
+        .send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease-in-out;
+        }
+    
+        .send-button:hover {
+            background: var(--primary-hover);
+        }
+    
+        /* Video Call Styles */
+        #video-call-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: none;
+        }
+    
+        #video-call-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            cursor: pointer;
+        }
+    
+        #video-call-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+    
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+    
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+    
+        /* Animation for new messages */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    
+        .new-message {
+            animation: fadeIn 0.3s ease-out;
+        }
+    
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border-radius: 1.125rem;
+            margin-bottom: 1rem;
+            width: fit-content;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+    
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667781;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+    
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+    
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+    
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    
+        @keyframes typingAnimation {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+    
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+    
+            .sidebar-expanded {
+                width: 280px;
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+                background: white;
+            }
+    
+            .sidebar-collapsed {
+                width: 0;
+            }
+        }
+        .group-actions {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 0.5rem; /* Add spacing between buttons */
+            margin-top: 1rem; /* Add spacing above the buttons */
+        }
+        
+        .group-actions a, .group-actions button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem; /* Adjust padding for better button size */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-size: 0.875rem; /* Consistent font size */
+            width: 100%; /* Ensure buttons take full width of the container */
+            box-sizing: border-box; /* Include padding and border in dimensions */
+            transition: all 0.2s ease-in-out; /* Smooth hover effect */
+        }
+        
+        .group-actions a:hover, .group-actions button:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar bg-white shadow-md flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
+        <div class="p-4 border-b border-gray-100">
+            <div class="flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+                <span class="ml-3 font-bold text-lg text-gray-800 hidden-collapsed">GroupHub</span>
+            </div>
+        </div>
+        
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="{%url  'for_you'%}" class="nav-item active flex items-center p-3 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-home text-lg w-6"></i>
+                        <span class="ml-3 hidden-collapsed">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item flex items-center p-3 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-users text-lg w-6"></i>
+                        <span class="ml-3 hidden-collapsed">My Groups</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item flex items-center p-3 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-comments text-lg w-6"></i>
+                        <span class="ml-3 hidden-collapsed">Messages</span>
+                        <span class="ml-auto bg-indigo-600 text-white text-xs px-2 py-1 rounded-full hidden-collapsed">3</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item flex items-center p-3 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-bell text-lg w-6"></i>
+                        <span class="ml-3 hidden-collapsed">Notifications</span>
+                        <span class="ml-auto bg-indigo-600 text-white text-xs px-2 py-1 rounded-full hidden-collapsed">5</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item flex items-center p-3 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-cog text-lg w-6"></i>
+                        <span class="ml-3 hidden-collapsed">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-100 mt-auto">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="ml-3 hidden-collapsed">
+                    <div class="font-medium text-gray-800">Sarah Johnson</div>
+                    <div class="text-xs text-gray-500">@sarahj</div>
+                </div>
+                <button class="ml-auto text-gray-500 hover:text-gray-700 hidden-collapsed">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto">
+        <!-- Groups Page (default view) -->
+        <div id="groups-page" class="container mx-auto px-4 py-8">
+            <!-- Header Section -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Groups & Communities</h1>
+                    <p class="text-gray-500">Connect with people who share your interests</p>
+                </div>
+                <button id="open-modal" class="bg-indigo-600 text-white px-6 py-2 rounded-lg flex items-center space-x-2 hover:bg-indigo-700 transition shadow-md">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Group</span>
+                </button>
+            </div>
+
+            <!-- Recommended Groups Section -->
+            <div class="mb-12">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Recommended Groups</h2>
+                    <a href="#" class="text-indigo-600 font-medium text-sm hover:underline">See all</a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for group in recommended_groups %}
+                    <div class="group-card bg-white rounded-xl overflow-hidden shadow-md">
+                        <div class="group-banner relative" style="background-color: {% cycle '#6366f1' '#f43f5e' '#10b981' '#f59e0b' %};">
+                            {% if group.banner %}
+                            <img src="{{ group.banner.url }}" alt="{{ group.name }} banner" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                        <div class="relative">
+                            <div class="group-avatar bg-gray-200 overflow-hidden">
+                                {% if group.avatar %}
+                                <img src="{{ group.avatar.url }}" alt="{{ group.name }} avatar" class="w-full h-full object-cover">
+                                {% else %}
+                                <i class="fas fa-users text-gray-400 text-4xl w-full h-full flex items-center justify-center"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="pt-12 px-4 pb-4">
+                            <h3 class="group-title text-lg font-semibold mb-1">{{ group.name }}</h3>
+                            <div class="group-members text-gray-500 text-sm mb-2 flex items-center">
+                                <i class="fas fa-users mr-1"></i>
+                                <span>{{ group.members.count }} members</span>
+                            </div>
+                            <p class="group-description text-gray-600 text-sm mb-4 line-clamp-3">
+                                {{ group.description }}
+                            </p>
+                            <div class="group-actions flex space-x-2">
+                                <form method="post" action="{% url 'group_detail' group.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" name="join_group" class="join-group-btn bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm w-full flex items-center justify-center space-x-1 hover:bg-indigo-700 transition">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Join</span>
+                                    </button>
+                                </form>
+                                <a href="{% url 'group_detail' group.id %}" class="border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-sm w-full flex items-center justify-center space-x-1 hover:bg-indigo-50 transition">
+                                    <i class="fas fa-eye"></i>
+                                    <span>View</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Your Groups Section -->
+            <div class="mb-12">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Your Groups</h2>
+                    <a href="#" class="text-indigo-600 font-medium text-sm hover:underline">See all</a>
+                </div>
+
+                {% if user_groups %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for group in user_groups %}
+                    <div class="group-card bg-white rounded-xl overflow-hidden shadow-md">
+                        <div class="group-banner relative" style="background-color: {% cycle '#6366f1' '#f43f5e' '#10b981' '#f59e0b' %};">
+                            {% if group.banner %}
+                            <img src="{{ group.banner.url }}" alt="{{ group.name }} banner" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                        <div class="relative">
+                            <div class="group-avatar bg-gray-200 overflow-hidden">
+                                {% if group.avatar %}
+                                <img src="{{ group.avatar.url }}" alt="{{ group.name }} avatar" class="w-full h-full object-cover">
+                                {% else %}
+                                <i class="fas fa-users text-gray-400 text-4xl w-full h-full flex items-center justify-center"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="pt-12 px-4 pb-4">
+                            <h3 class="group-title text-lg font-semibold mb-1">{{ group.name }}</h3>
+                            <div class="group-members text-gray-500 text-sm mb-2 flex items-center">
+                                <i class="fas fa-users mr-1"></i>
+                                <span>{{ group.members.count }} members</span>
+                            </div>
+                            <p class="group-description text-gray-600 text-sm mb-4 line-clamp-3">
+                                {{ group.description }}
+                            </p>
+                            <div class="group-actions flex space-x-2">
+                                <a href="{% url 'group_detail' group.id %}" 
+                                   class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm w-full flex items-center justify-center space-x-1 hover:bg-indigo-700 transition shadow-md">
+                                    <i class="fas fa-door-open"></i>
+                                    <span>Enter</span>
+                                </a>
+                                <button onclick="openGroupChat('{{ group.id }}', '{{ group.name }}')" 
+                                        class="border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-sm w-full flex items-center justify-center space-x-1 hover:bg-indigo-50 transition shadow-md">
+                                    <i class="fas fa-comments"></i>
+                                    <span>Chat</span>
+                                </button>
+                                <a href="{% url 'videocall' %}" 
+                                   class="border border-green-600 text-green-600 px-4 py-2 rounded-lg text-sm w-full flex items-center justify-center space-x-1 hover:bg-green-50 transition shadow-md">
+                                    <i class="fas fa-video"></i>
+                                    <span>Video Call</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-white rounded-lg shadow p-8 text-center">
+                    <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-700 mb-2">You haven't joined any groups yet</h3>
+                    <p class="text-gray-500 mb-4">Join some recommended groups or create your own to get started</p>
+                    <button id="open-modal-alt" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-md">
+                        <i class="fas fa-plus mr-2"></i> Create Group
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Chat Page (hidden by default) -->
+        <div id="chat-page" class="hidden h-full">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header p-4 flex items-center">
+                    <button onclick="closeGroupChat()" class="mr-4 text-white">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="flex-1">
+                        <h2 class="font-semibold text-lg" id="chat-group-name">Group Chat</h2>
+                        <p class="text-xs opacity-80" id="typing-indicator"></p>
+                    </div>
+                    <button onclick="startVideoCall()" class="mr-4 text-white bg-green-500 p-2 rounded-full hover:bg-green-600">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-600">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Date divider -->
+                    <div class="text-center my-4">
+                        <span class="bg-white px-3 py-1 rounded-full text-xs text-gray-500 shadow-sm">Today</span>
+                    </div>
+                    
+                    <!-- Sample received message -->
+                    <div class="message received">
+                        <div class="message-bubble">
+                            <div class="message-text">Hey everyone! How's it going?</div>
+                            <div class="message-time">10:30 AM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sample sent message -->
+                    <div class="message sent">
+                        <div class="message-bubble">
+                            <div class="message-text">Pretty good! Just working on the project.</div>
+                            <div class="message-time">10:32 AM <i class="fas fa-check message-status"></i></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Typing indicator -->
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+                
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <button class="text-gray-500 mx-2">
+                        <i class="far fa-smile text-xl"></i>
+                    </button>
+                    <button class="text-gray-500">
+                        <i class="fas fa-paperclip text-xl"></i>
+                    </button>
+                    <input type="text" class="chat-input" placeholder="Type a message" id="chat-input">
+                    <button class="send-button" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Call Container -->
+    <div id="video-call-container">
+        <button id="video-call-close" onclick="endVideoCall()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="video-call-element"></div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="create-group-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl w-full max-w-md mx-4 modal-container overflow-hidden flex flex-col">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center border-b p-4 sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-semibold">Create New Group</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="modal-content overflow-y-auto flex-1 p-4">
+                <form method="post" enctype="multipart/form-data" action="{% url 'groups' %}">
+                    {% csrf_token %}
+                    <!-- Image Upload -->
+                    <div class="mb-6 text-center">
+                        <label class="block text-gray-700 mb-2 font-medium">Group Image</label>
+                        <div class="flex flex-col items-center">
+                            <div class="w-32 h-32 rounded-full bg-gray-200 mb-4 overflow-hidden flex items-center justify-center border-2 border-dashed border-gray-300" id="avatar-preview">
+                                <i class="fas fa-users text-gray-400 text-4xl"></i>
+                            </div>
+                            <label class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition inline-block">
+                                <input type="file" name="avatar" id="avatar-input" class="hidden" accept="image/*">
+                                <i class="fas fa-upload mr-2"></i>
+                                <span>Choose Image</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Group Name -->
+                    <div class="mb-4">
+                        <label for="id_name" class="block text-gray-700 mb-2 font-medium">Group Name *</label>
+                        <input type="text" name="name" id="id_name" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                               required placeholder="Enter group name">
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-4">
+                        <label for="id_category" class="block text-gray-700 mb-2 font-medium">Category *</label>
+                        <select name="category" id="id_category" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <option value="" disabled selected>Select a category</option>
+                            <option value="hobbies">Hobbies & Interests</option>
+                            <option value="education">Education</option>
+                            <option value="technology">Technology</option>
+                            <option value="health">Health & Wellness</option>
+                            <option value="business">Business</option>
+                            <option value="entertainment">Entertainment</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label for="id_description" class="block text-gray-700 mb-2 font-medium">Description *</label>
+                        <textarea name="description" id="id_description" rows="4"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                  required placeholder="Tell people what this group is about"></textarea>
+                    </div>
+
+                    <!-- Privacy -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2 font-medium">Privacy *</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-3 p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="radio" name="privacy" value="public" checked class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                                <div>
+                                    <span class="block font-medium">Public Group</span>
+                                    <span class="block text-sm text-gray-500">Anyone can view and join this group</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center space-x-3 p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="radio" name="privacy" value="private" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                                <div>
+                                    <span class="block font-medium">Private Group</span>
+                                    <span class="block text-sm text-gray-500">Only approved members can join</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="sticky bottom-0 bg-white pt-4 pb-2 border-t">
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" id="cancel-modal" 
+                                    class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Create Group
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const modal = document.getElementById('create-group-modal');
+        const openModalBtns = document.querySelectorAll('[id^="open-modal"]');
+        const closeModalBtns = document.querySelectorAll('#close-modal, #cancel-modal');
+        const avatarInput = document.getElementById('avatar-input');
+        const avatarPreview = document.getElementById('avatar-preview');
+        const joinButtons = document.querySelectorAll('.join-group-btn');
+        const groupsPage = document.getElementById('groups-page');
+        const chatPage = document.getElementById('chat-page');
+        const chatGroupName = document.getElementById('chat-group-name');
+        const videoCallContainer = document.getElementById('video-call-container');
+        let currentGroupId = null;
+        let currentGroupName = null;
+        let zegoCloudInstance = null;
+
+        // Modal Functions
+        function showModal() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event Listeners
+        openModalBtns.forEach(btn => {
+            btn.addEventListener('click', showModal);
+        });
+
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', hideModal);
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // Image Preview
+        avatarInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    avatarPreview.classList.remove('border-dashed', 'border-gray-300');
+                    avatarPreview.classList.add('border-solid', 'border-indigo-200');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                avatarPreview.innerHTML = '<i class="fas fa-users text-gray-400 text-4xl"></i>';
+                avatarPreview.classList.add('border-dashed', 'border-gray-300');
+                avatarPreview.classList.remove('border-solid', 'border-indigo-200');
+            }
+        });
+
+        // Join Button Animation
+        joinButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const form = this.closest('form');
+                if (form) {
+                    // Visual feedback first
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Joining...</span>';
+                    this.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    this.classList.add('bg-indigo-400', 'cursor-not-allowed');
+                    
+                    // Submit form after animation
+                    setTimeout(() => {
+                        form.submit();
+                    }, 500);
+                }
+            });
+        });
+
+        // Form Validation
+        const groupForm = document.querySelector('#create-group-modal form');
+        if (groupForm) {
+            groupForm.addEventListener('submit', function(e) {
+                const name = document.getElementById('id_name').value.trim();
+                const category = document.getElementById('id_category').value;
+                const description = document.getElementById('id_description').value.trim();
+                
+                if (!name || !category || !description) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = groupForm.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creating...';
+                submitBtn.disabled = true;
+            });
+        }
+
+        // Chat Functions
+        function openGroupChat(groupId, groupName) {
+            currentGroupId = groupId;
+            currentGroupName = groupName;
+            chatGroupName.textContent = groupName;
+            groupsPage.classList.add('hidden');
+            chatPage.classList.remove('hidden');
+            
+            // Initialize WebSocket for this group
+            setupGroupChat(groupId);
+        }
+
+        function closeGroupChat() {
+            chatPage.classList.add('hidden');
+            groupsPage.classList.remove('hidden');
+            currentGroupId = null;
+            currentGroupName = null;
+            
+            // Close WebSocket connection if exists
+            if (window.chatSocket) {
+                chatSocket.close();
+            }
+        }
+
+        // Video Call Functions
+        function startVideoCall() {
+            if (!currentGroupId) return;
+            
+            // Show video call container
+            videoCallContainer.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize ZegoCloud video call
+            initializeZegoCloudCall(currentGroupId, currentGroupName);
+        }
+
+        function endVideoCall() {
+            // Hide video call container
+            videoCallContainer.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Leave the call if zegoCloudInstance exists
+            if (zegoCloudInstance) {
+                zegoCloudInstance.destroy();
+                zegoCloudInstance = null;
+            }
+        }
+
+        function initializeZegoCloudCall(groupId, groupName) {
+            // Replace these with your actual ZegoCloud credentials
+            const appID = YOUR_ZEGOCLOUD_APP_ID; // Replace with your ZegoCloud App ID
+            const serverSecret = YOUR_ZEGOCLOUD_SERVER_SECRET; // Replace with your ZegoCloud Server Secret
+            
+            // Generate a token (in production, this should be done server-side)
+            const token = ZegoUIKitPrebuilt.generateKitTokenForTest(
+                appID,
+                serverSecret,
+                groupId.toString(), // Room ID (using group ID)
+                Date.now().toString(), // User ID
+                currentGroupName // User Name
+            );
+            
+            // Create instance object from Token.
+            const zp = ZegoUIKitPrebuilt.create(token);
+            zegoCloudInstance = zp;
+            
+            // Start the call
+            zp.joinRoom({
+                container: document.querySelector("#video-call-element"),
+                scenario: {
+                    mode: ZegoUIKitPrebuilt.GroupCall, // To implement 1-on-1 calls, change this to ZegoUIKitPrebuilt.OneONoneCall.
+                },
+                showPreJoinView: false,
+                turnOnMicrophoneWhenJoining: true,
+                turnOnCameraWhenJoining: true,
+                showMyCameraToggleButton: true,
+                showMyMicrophoneToggleButton: true,
+                showAudioVideoSettingsButton: true,
+                showScreenSharingButton: true,
+                showTextChat: true,
+                showUserList: true,
+                maxUsers: 50,
+                layout: "Auto",
+                showLayoutButton: true,
+            });
+        }
+
+        // Sample data - replace with your actual data
+        const groupMembers = ['Alex', 'Jamie', 'Taylor'];
+        let isTyping = false;
+        
+        // Function to add a new message to the chat
+        function addMessage(text, isSent = true) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isSent ? 'sent' : 'received'} new-message`;
+            messageElement.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">
+                        ${timeString}
+                        ${isSent ? '<i class="fas fa-check message-status"></i>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Simulate reply after 1-3 seconds
+            if (isSent) {
+                setTimeout(() => {
+                    simulateReply();
+                }, Math.random() * 2000 + 1000);
+            }
+        }
+        
+        // Function to simulate a reply from another group member
+        function simulateReply() {
+            if (isTyping) return;
+            
+            isTyping = true;
+            const typingIndicator = document.getElementById('typing-indicator');
+            const randomMember = groupMembers[Math.floor(Math.random() * groupMembers.length)];
+            typingIndicator.textContent = `${randomMember} is typing...`;
+            
+            // Show typing for 1-3 seconds before sending message
+            setTimeout(() => {
+                typingIndicator.textContent = '';
+                isTyping = false;
+                
+                const replies = [
+                    "That's great to hear!",
+                    "I'm working on it too",
+                    "Let's discuss this in our next meeting",
+                    "Can you share your progress?",
+                    "I'll send you the files soon"
+                ];
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                addMessage(randomReply, false);
+            }, Math.random() * 2000 + 1000);
+        }
+        
+        // Event listeners for chat
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message);
+                input.value = '';
+                
+                // Send message via WebSocket if connected
+                if (window.chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify({
+                        'message': message,
+                        'group_id': currentGroupId
+                    }));
+                }
+            }
+        }
+        
+         // Initialize WebSocket for group chat
+         function setupGroupChat(groupId) {
+            if (window.chatSocket) {
+                chatSocket.close();
+            }
+            
+            // In a real application, you would use wss:// for secure connections in production
+            const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const chatSocket = new WebSocket(
+                `${protocol}${window.location.host}/ws/group/${groupId}/chat/`
+            );
+
+            chatSocket.onopen = function(e) {
+                console.log('WebSocket connection established');
+                // Send a join message to the server if needed
+                chatSocket.send(JSON.stringify({
+                    'type': 'join',
+                    'group_id': groupId,
+                    'user_id': getCurrentUserId() // You need to implement this function
+                }));
+            };
+
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                handleIncomingMessage(data);
+            };
+
+            chatSocket.onerror = function(e) {
+                console.error('WebSocket error:', e);
+            };
+
+            chatSocket.onclose = function(e) {
+                console.log('WebSocket connection closed');
+                if (e.code !== 1000) { // 1000 means normal closure
+                    console.error('Chat socket closed unexpectedly');
+                    setTimeout(() => {
+                        if (currentGroupId) {
+                            setupGroupChat(currentGroupId);
+                        }
+                    }, 5000);
+                }
+            };
+
+            window.chatSocket = chatSocket;
+        }
+        
+        // Get current user ID (you would replace this with your actual user ID retrieval)
+        function getCurrentUserId() {
+            // In a real application, you might get this from a meta tag or global variable
+            return 1; // Example user ID
+        }
+        
+        // Handle different types of incoming messages
+        function handleIncomingMessage(data) {
+            switch(data.type) {
+                case 'chat_message':
+                    addMessageToChat(data);
+                    break;
+                case 'user_join':
+                    showUserJoinNotification(data.username);
+                    break;
+                case 'user_leave':
+                    showUserLeaveNotification(data.username);
+                    break;
+                case 'typing':
+                    showTypingIndicator(data.username);
+                    break;
+                case 'video_call_started':
+                    notifyVideoCallStarted(data.initiator);
+                    break;
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        }
+        
+        // Add a message to the chat UI
+        function addMessageToChat(data) {
+            const isCurrentUser = data.user_id === getCurrentUserId();
+            const messageElement = createMessageElement(data, isCurrentUser);
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Create a message element
+        function createMessageElement(data, isCurrentUser) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'} new-message`;
+            
+            messageElement.innerHTML = `
+                <div class="message-bubble">
+                    ${!isCurrentUser ? `<div class="message-sender text-xs font-semibold text-gray-600 mb-1">${data.username}</div>` : ''}
+                    <div class="message-text">${data.message}</div>
+                    <div class="message-time">
+                        ${timeString}
+                        ${isCurrentUser ? '<i class="fas fa-check message-status"></i>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            return messageElement;
+        }
+        
+        // Show user join notification
+        function showUserJoinNotification(username) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const notification = document.createElement('div');
+            notification.className = 'text-center my-2';
+            notification.innerHTML = `
+                <span class="bg-gray-100 px-3 py-1 rounded-full text-xs text-gray-500">
+                    ${username} joined the group
+                </span>
+            `;
+            messagesContainer.appendChild(notification);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Show user leave notification
+        function showUserLeaveNotification(username) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const notification = document.createElement('div');
+            notification.className = 'text-center my-2';
+            notification.innerHTML = `
+                <span class="bg-gray-100 px-3 py-1 rounded-full text-xs text-gray-500">
+                    ${username} left the group
+                </span>
+            `;
+            messagesContainer.appendChild(notification);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator(username) {
+            const typingIndicator = document.getElementById('typing-indicator');
+            typingIndicator.textContent = `${username} is typing...`;
+            
+            // Clear typing indicator after 3 seconds
+            clearTimeout(window.typingTimeout);
+            window.typingTimeout = setTimeout(() => {
+                typingIndicator.textContent = '';
+            }, 3000);
+        }
+        
+        // Notify users when a video call is started
+        function notifyVideoCallStarted(initiator) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const notification = document.createElement('div');
+            notification.className = 'text-center my-2';
+            notification.innerHTML = `
+                <div class="bg-blue-100 px-4 py-2 rounded-lg inline-block">
+                    <span class="text-blue-700 text-sm">
+                        ${initiator} started a video call. 
+                        <button onclick="startVideoCall()" class="text-blue-600 font-semibold hover:underline">
+                            Join now
+                        </button>
+                    </span>
+                </div>
+            `;
+            messagesContainer.appendChild(notification);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Send typing indicator to server
+        function sendTypingIndicator() {
+            if (window.chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'type': 'typing',
+                    'group_id': currentGroupId,
+                    'user_id': getCurrentUserId()
+                }));
+            }
+        }
+        
+        // Event listener for typing
+        document.getElementById('chat-input').addEventListener('input', function() {
+            sendTypingIndicator();
+        });
+        
+        // Enhanced send message function
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add message to UI immediately for better UX
+                addMessageToChat({
+                    message: message,
+                    user_id: getCurrentUserId(),
+                    username: 'You', // Replace with actual username
+                    type: 'chat_message'
+                });
+                
+                input.value = '';
+                
+                // Send message via WebSocket if connected
+                if (window.chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify({
+                        'type': 'chat_message',
+                        'message': message,
+                        'group_id': currentGroupId,
+                        'user_id': getCurrentUserId()
+                    }));
+                } else {
+                    console.error('WebSocket is not connected');
+                    // You might want to implement a fallback or retry mechanism here
+                }
+            }
+        }
+        
+        // Initialize chat with some sample messages when opened
+        document.addEventListener('DOMContentLoaded', function() {
+            const messagesContainer = document.getElementById('chat-messages');
+            if (messagesContainer) {
+                // Add sample messages or load from server
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Add welcome message
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.className = 'text-center my-4';
+                welcomeMessage.innerHTML = `
+                    <span class="bg-white px-3 py-1 rounded-full text-xs text-gray-500 shadow-sm">
+                        ${new Date().toLocaleDateString()}
+                    </span>
+                    <div class="mt-2 text-sm text-gray-500">
+                        Welcome to the group chat!
+                    </div>
+                `;
+                messagesContainer.appendChild(welcomeMessage);
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Initialize any other UI elements
+            initializeUI();
+        });
+        
+        // Initialize UI elements
+        function initializeUI() {
+            // Add emoji picker functionality
+            const emojiButton = document.querySelector('.chat-input-container .fa-smile');
+            if (emojiButton) {
+                emojiButton.addEventListener('click', function() {
+                    // Implement emoji picker functionality
+                    console.log('Emoji picker clicked');
+                    // You would integrate an emoji picker library here
+                });
+            }
+            
+            // Add file attachment functionality
+            const attachButton = document.querySelector('.chat-input-container .fa-paperclip');
+            if (attachButton) {
+                attachButton.addEventListener('click', function() {
+                    // Implement file attachment functionality
+                    console.log('Attachment button clicked');
+                    // You would trigger a file input dialog here
+                });
+            }
+        }
+        
+        // Add this to your existing code to handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && currentGroupId) {
+                // Reconnect WebSocket if needed when page becomes visible again
+                if (!window.chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+                    setupGroupChat(currentGroupId);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

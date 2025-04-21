@@ -1,0 +1,253 @@
+/* static/css/chat.css */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.back-button {
+    color: white;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.group-info {
+    flex: 1;
+}
+
+.group-info h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.group-info p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.call-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.call-button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.call-button:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background-image: url('/static/images/chat-bg.png');
+    background-repeat: repeat;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.received {
+    justify-content: flex-start;
+}
+
+.message.sent {
+    justify-content: flex-end;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.message-content {
+    max-width: 70%;
+}
+
+.sender-name {
+    font-size: 12px;
+    color: #65676b;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.message-bubble {
+    padding: 10px 15px;
+    border-radius: 18px;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.message.sent .message-bubble {
+    background: #0084ff;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.message.received .message-bubble {
+    background: white;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.message-time {
+    font-size: 11px;
+    color: #65676b;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.message.sent .message-time {
+    justify-content: flex-end;
+    color: rgba(255,255,255,0.7);
+}
+
+.status-icon {
+    margin-left: 5px;
+    font-size: 10px;
+}
+
+.status-icon.read {
+    color: #53bdeb;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    background: white;
+    border-top: 1px solid #e9edef;
+    align-items: center;
+}
+
+#message-input {
+    flex: 1;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 15px;
+    background: #f0f2f5;
+    margin: 0 10px;
+    outline: none;
+    font-size: 15px;
+}
+
+.emoji-button, .attachment-button {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+#send-button {
+    background: #0084ff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.call-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.call-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.call-option:hover {
+    background: #f5f5f5;
+}
+
+.call-option i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #0084ff;
+}

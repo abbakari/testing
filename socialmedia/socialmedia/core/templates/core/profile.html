@@ -1,0 +1,121 @@
+<!-- core/templates/core/profile.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-picture">
+            {% if profile_user.profile_picture %}
+            <img src="{{ profile_user.profile_picture.url }}" alt="{{ profile_user.username }}">
+            {% else %}
+            <span class="material-icons profile-icon">account_circle</span>
+            {% endif %}
+        </div>
+        
+        <div class="profile-info">
+            <h1>{{ profile_user.username }}</h1>
+            
+            {% if profile_user.bio %}
+            <p class="profile-bio">{{ profile_user.bio }}</p>
+            {% endif %}
+            
+            <div class="profile-stats">
+                <div class="stat">
+                    <span class="count">{{ profile_user.post_set.count }}</span>
+                    <span class="label">Posts</span>
+                </div>
+                <div class="stat">
+                    <span class="count">{{ profile_user.friends.count }}</span>
+                    <span class="label">Friends</span>
+                </div>
+            </div>
+            
+            {% if is_self %}
+            <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+            {% else %}
+                {% if is_friend %}
+                <a href="{% url 'remove_friend' profile_user.username %}" class="btn btn-secondary">Remove Friend</a>
+                {% else %}
+                    {% if friend_request %}
+                        {% if friend_request.from_user == request.user %}
+                        <button class="btn btn-disabled">Request Sent</button>
+                        <a href="{% url 'cancel_friend_request' friend_request.id %}" class="btn btn-secondary">Cancel</a>
+                        {% else %}
+                        <a href="{% url 'accept_friend_request' friend_request.id %}" class="btn btn-primary">Accept Request</a>
+                        <a href="{% url 'reject_friend_request' friend_request.id %}" class="btn btn-secondary">Reject</a>
+                        {% endif %}
+                    {% else %}
+                    <a href="{% url 'send_friend_request' profile_user.username %}" class="btn btn-primary">Add Friend</a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="profile-content">
+        <h2>Posts</h2>
+        
+        {% if posts %}
+        <div class="posts-container">
+            {% for post in posts %}
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-time">{{ post.created_at|timesince }} ago</span>
+                </div>
+                
+                <div class="post-content">
+                    <p>{{ post.content }}</p>
+                    
+                    {% if post.media_file %}
+                        {% if post.media_type == 'image' %}
+                        <div class="post-media">
+                            <img src="{{ post.media_file.url }}" alt="Post image">
+                        </div>
+                        {% elif post.media_type == 'video' %}
+                        <div class="post-media">
+                            <video controls>
+                                <source src="{{ post.media_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        {% elif post.media_type == 'audio' %}
+                        <div class="post-media">
+                            <audio controls>
+                                <source src="{{ post.media_file.url }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <div class="post-actions">
+                    <a href="{% url 'like_post' post.id %}" class="post-action">
+                        <span class="material-icons">
+                            {% if request.user in post.likes.all %}favorite{% else %}favorite_border{% endif %}
+                        </span>
+                        <span>{{ post.likes.count }}</span>
+                    </a>
+                    <a href="{% url 'post_detail' post.id %}" class="post-action">
+                        <span class="material-icons">comment</span>
+                        <span>{{ post.comments.count }}</span>
+                    </a>
+                    {% if post.user == request.user %}
+                    <a href="{% url 'delete_post' post.id %}" class="post-action delete-post">
+                        <span class="material-icons">delete</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-posts">
+            <p>No posts yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

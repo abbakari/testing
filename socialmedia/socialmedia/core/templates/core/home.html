@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Animated Text Ticker -->
+<div class="ticker-container">
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item">🌟 Connect with friends</span>
+            <span class="ticker-item">🎨 Share your creativity</span>
+            <span class="ticker-item">📸 Post your moments</span>
+            <span class="ticker-item">💬 Start conversations</span>
+            <span class="ticker-item">🔔 Get notifications</span>
+        </div>
+    </div>
+</div>
+
+<div class="home-container">
+    <!-- Floating particles background -->
+    <div id="particles-js"></div>
+    
+    <div class="post-form-container slide-up">
+        <form method="POST" enctype="multipart/form-data" class="post-form">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.content }}
+            </div>
+            <div class="form-footer">
+                <div class="media-options">
+                    <label for="id_media_file" class="media-option pulse">
+                        <span class="material-icons">image</span> 
+                        <span class="media-text">Photo/Video</span>
+                    </label>
+                    <input type="file" name="media_file" id="id_media_file" accept="image/*,video/*,audio/*" style="display: none;">
+                </div>
+                <button type="submit" class="btn btn-primary gradient-btn">
+                    <span class="btn-text">Post</span>
+                    <span class="btn-icon material-icons">send</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="posts-container">
+        {% for post in posts %}
+        <div class="post card-hover">
+            <div class="post-header">
+                <a href="{% url 'profile' post.user.username %}" class="post-user">
+                    {% if post.user.profile_picture %}
+                    <img src="{{ post.user.profile_picture.url }}" alt="{{ post.user.username }}" class="profile-pic-sm pulse">
+                    {% else %}
+                    <span class="material-icons profile-pic-sm pulse">account_circle</span>
+                    {% endif %}
+                    <span class="gradient-text">{{ post.user.username }}</span>
+                </a>
+                <span class="post-time">{{ post.created_at|timesince }} ago</span>
+            </div>
+            
+            <div class="post-content">
+                <p class="text-pop">{{ post.content }}</p>
+                
+                {% if post.media_file %}
+                    {% if post.media_type == 'image' %}
+                    <div class="post-media media-pop">
+                        <img src="{{ post.media_file.url }}" alt="Post image">
+                    </div>
+                    {% elif post.media_type == 'video' %}
+                    <div class="post-media media-pop">
+                        <video controls>
+                            <source src="{{ post.media_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% elif post.media_type == 'audio' %}
+                    <div class="post-media media-pop">
+                        <audio controls>
+                            <source src="{{ post.media_file.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <div class="post-actions">
+                <a href="{% url 'like_post' post.id %}" class="post-action like-btn">
+                    <span class="material-icons heart-beat">
+                        {% if request.user in post.likes.all %}favorite{% else %}favorite_border{% endif %}
+                    </span>
+                    <span class="like-count">{{ post.likes.count }}</span>
+                </a>
+                <a href="{% url 'post_detail' post.id %}" class="post-action comment-btn">
+                    <span class="material-icons">comment</span>
+                    <span>{{ post.comments.count }}</span>
+                </a>
+                {% if post.user == request.user %}
+                <a href="{% url 'delete_post' post.id %}" class="post-action delete-post">
+                    <span class="material-icons">delete</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-posts slide-up">
+            <p>No posts to show. Follow some people to see their posts here!</p>
+            <div class="empty-animation">
+                <div class="empty-dot"></div>
+                <div class="empty-dot"></div>
+                <div class="empty-dot"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Include particles.js library -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize particles.js
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": ["#6200ee", "#03dac6", "#ff0266", "#7c4dff"]
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                },
+                "polygon": {
+                    "nb_sides": 5
+                }
+            },
+            "opacity": {
+                "value": 0.5,
+                "random": true,
+                "anim": {
+                    "enable": true,
+                    "speed": 1,
+                    "opacity_min": 0.1,
+                    "sync": false
+                }
+            },
+            "size": {
+                "value": 3,
+                "random": true,
+                "anim": {
+                    "enable": true,
+                    "speed": 2,
+                    "size_min": 0.1,
+                    "sync": false
+                }
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#7c4dff",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 2,
+                "direction": "none",
+                "random": true,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false,
+                "attract": {
+                    "enable": true,
+                    "rotateX": 600,
+                    "rotateY": 1200
+                }
+            }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": {
+                    "enable": true,
+                    "mode": "grab"
+                },
+                "onclick": {
+                    "enable": true,
+                    "mode": "push"
+                },
+                "resize": true
+            },
+            "modes": {
+                "grab": {
+                    "distance": 140,
+                    "line_linked": {
+                        "opacity": 1
+                    }
+                },
+                "bubble": {
+                    "distance": 400,
+                    "size": 40,
+                    "duration": 2,
+                    "opacity": 8,
+                    "speed": 3
+                },
+                "repulse": {
+                    "distance": 200,
+                    "duration": 0.4
+                },
+                "push": {
+                    "particles_nb": 4
+                },
+                "remove": {
+                    "particles_nb": 2
+                }
+            }
+        },
+        "retina_detect": true
+    });
+
+    // Scroll animations
+    const animateOnScroll = function() {
+        const elements = document.querySelectorAll('.slide-up, .text-pop, .media-pop');
+        
+        elements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.2;
+            
+            if (elementPosition < screenPosition) {
+                element.classList.add('animated');
+            }
+        });
+    };
+
+    window.addEventListener('scroll', animateOnScroll);
+    animateOnScroll(); // Run once on load
+
+    // Like button animation
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.add('liked');
+            setTimeout(() => {
+                this.classList.remove('liked');
+            }, 1000);
+        });
+    });
+
+    // File input preview
+    const fileInput = document.getElementById('id_media_file');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const label = this.previousElementSibling;
+            if (this.files.length > 0) {
+                label.querySelector('.media-text').textContent = this.files[0].name;
+                label.classList.add('file-selected');
+            } else {
+                label.querySelector('.media-text').textContent = 'Photo/Video';
+                label.classList.remove('file-selected');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

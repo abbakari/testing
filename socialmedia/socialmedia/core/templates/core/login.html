@@ -1,0 +1,37 @@
+<!-- core/templates/core/login.html -->
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="gradient-text">Login</h2>
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <span class="material-icons form-icon">person</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <span class="material-icons form-icon">lock</span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary gradient-btn full-width">
+                <span class="btn-text">Login</span>
+                <span class="btn-icon material-icons">login</span>
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+            <p><a href="{% url 'password_reset' %}">Forgot password?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

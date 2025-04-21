@@ -1,0 +1,44 @@
+<!-- core/templates/core/search.html -->
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <h2>Search Results for "{{ query }}"</h2>
+    
+    {% if users %}
+    <div class="search-results">
+        {% for user in users %}
+        <div class="user-card">
+            <a href="{% url 'profile' user.username %}" class="user-info">
+                {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="profile-pic-md">
+                {% else %}
+                <span class="material-icons profile-pic-md">account_circle</span>
+                {% endif %}
+                <div class="user-details">
+                    <h3>{{ user.username }}</h3>
+                    {% if user.bio %}<p>{{ user.bio|truncatechars:50 }}</p>{% endif %}
+                </div>
+            </a>
+            
+            {% if user != request.user %}
+                {% if user.is_friend %}
+                <span class="friend-status">Friends</span>
+                {% elif user.pending_request %}
+                <button class="btn btn-disabled">Request Sent</button>
+                {% else %}
+                <a href="{% url 'send_friend_request' user.username %}" class="btn btn-primary">Add Friend</a>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-results">
+        <p>No users found matching your search.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

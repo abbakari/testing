@@ -1,0 +1,2496 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectHub - Groups & Communities</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f43f5e;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-dark: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--gray-dark);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: #eef2ff;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-profile {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-profile:hover {
+            background-color: #f1f5f9;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            width: 300px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .search-bar i {
+            color: var(--gray);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: #eef2ff;
+        }
+
+        /* Groups Section */
+        .groups-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .see-all {
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .group-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .group-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-banner {
+            height: 120px;
+            background-color: var(--primary);
+            position: relative;
+        }
+
+        .group-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .group-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background-color: #ddd;
+            position: absolute;
+            bottom: -40px;
+            left: 1rem;
+            overflow: hidden;
+        }
+
+        .group-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .group-content {
+            padding: 2.5rem 1.5rem 1.5rem;
+        }
+
+        .group-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .group-members {
+            color: var(--gray-dark);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .group-description {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .group-actions .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            flex-grow: 1;
+        }
+
+        /* Active Group Section */
+        .active-group {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .active-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .active-group-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-group {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-group:hover {
+            background: #f1f5f9;
+        }
+
+        .group-media {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .media-btn {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background: #f8fafc;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        .media-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .media-btn i {
+            font-size: 1.25rem;
+        }
+
+        .chat-container {
+            height: 400px;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 80%;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ddd;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .message.received .message-bubble {
+            background: #f1f5f9;
+            border-top-left-radius: 0;
+        }
+
+        .message.sent .message-bubble {
+            background: var(--primary);
+            color: white;
+            border-top-right-radius: 0;
+        }
+
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+        }
+
+        .message.sent .message-info {
+            justify-content: flex-end;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 2rem;
+            outline: none;
+        }
+
+        .chat-input button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Create Group Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #f1f5f9;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+        }
+
+        .avatar-upload-btn {
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .avatar-upload-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                padding: 1rem;
+            }
+            
+            .nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .user-profile {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .groups-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .groups-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .group-actions {
+                flex-direction: column;
+            }
+            
+            .group-actions .btn {
+                width: 100%;
+            }
+            
+            .media-btn span {
+                display: none;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-users"></i>
+            <span>ConnectHub</span>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-users"></i>
+                <span>Groups</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-comment-dots"></i>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <div class="user-profile">
+            <div class="user-avatar">JS</div>
+            <div class="user-info">
+                <div class="user-name">John Smith</div>
+                <div class="user-email">john@example.com</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Groups & Communities</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search groups...">
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="createGroupBtn">
+                <i class="fas fa-plus"></i>
+                <span>Create Group</span>
+            </button>
+            <button class="btn btn-outline">
+                <i class="fas fa-filter"></i>
+                <span>Filters</span>
+            </button>
+        </div>
+        
+        <div class="groups-section">
+            <div class="section-header">
+                <h2 class="section-title">Recommended Groups</h2>
+                <span class="see-all">See all</span>
+            </div>
+            
+            <div class="groups-grid">
+                <!-- Group Card 1 -->
+                <div class="group-card" data-group-id="1">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?nature" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?portrait" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Nature Lovers</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>1,245 members</span>
+                        </div>
+                        <p class="group-description">A community for nature enthusiasts to share photos, experiences, and organize hiking trips. Join us to explore the beauty of our planet!</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary join-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Join</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group Card 2 -->
+                <div class="group-card" data-group-id="2">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?technology" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?tech" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Tech Enthusiasts</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>3,782 members</span>
+                        </div>
+                        <p class="group-description">Discuss the latest in technology, gadgets, and innovations. Share your projects and get feedback from fellow tech lovers.</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary join-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Join</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group Card 3 -->
+                <div class="group-card" data-group-id="3">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?food" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?chef" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Food & Cooking</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>2,156 members</span>
+                        </div>
+                        <p class="group-description">Share recipes, cooking tips, and restaurant reviews. Weekly live cooking sessions with professional chefs.</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary join-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Join</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group Card 4 -->
+                <div class="group-card" data-group-id="4">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?fitness" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?gym" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Fitness Community</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>4,320 members</span>
+                        </div>
+                        <p class="group-description">Get fit together! Share workout routines, nutrition plans, and motivation. Weekly challenges and live workout sessions.</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary join-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Join</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="groups-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Groups</h2>
+                <span class="see-all">See all</span>
+            </div>
+            
+            <div class="groups-grid">
+                <!-- Group Card 5 (Joined) -->
+                <div class="group-card" data-group-id="5">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?music" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?singer" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Music Lovers</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>5,621 members</span>
+                        </div>
+                        <p class="group-description">For everyone who loves music! Share your favorite songs, discover new artists, and discuss music trends.</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary joined-btn" disabled>
+                                <i class="fas fa-check"></i>
+                                <span>Joined</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Open</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group Card 6 (Joined) -->
+                <div class="group-card" data-group-id="6">
+                    <div class="group-banner">
+                        <img src="https://source.unsplash.com/random/600x300/?books" alt="Group banner">
+                    </div>
+                    <div class="group-avatar">
+                        <img src="https://source.unsplash.com/random/200x200/?author" alt="Group avatar">
+                    </div>
+                    <div class="group-content">
+                        <h3 class="group-title">Book Club</h3>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            <span>1,893 members</span>
+                        </div>
+                        <p class="group-description">Monthly book discussions, author Q&As, and reading challenges. Our current read: "The Midnight Library" by Matt Haig.</p>
+                        <div class="group-actions">
+                            <button class="btn btn-primary joined-btn" disabled>
+                                <i class="fas fa-check"></i>
+                                <span>Joined</span>
+                            </button>
+                            <button class="btn btn-outline preview-btn">
+                                <i class="fas fa-eye"></i>
+                                <span>Open</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Group Section (Hidden by default) -->
+    <div class="active-group" id="activeGroup">
+        <div class="active-group-header">
+            <h2 class="active-group-title" id="activeGroupTitle">Group Name</h2>
+            <div class="close-group" id="closeGroupBtn">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <div class="group-media">
+            <button class="media-btn" id="chatBtn">
+                <i class="fas fa-comment-dots"></i>
+                <span>Chat</span>
+            </button>
+            <button class="media-btn" id="audioCallBtn">
+                <i class="fas fa-phone"></i>
+                <span>Audio Call</span>
+            </button>
+            <button class="media-btn" id="videoCallBtn">
+                <i class="fas fa-video"></i>
+                <span>Video Call</span>
+            </button>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                Group Chat
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type a message..." id="messageInput">
+                <button id="sendMessageBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Group Modal -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Group</h3>
+                <div class="close-modal" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                        <button class="avatar-upload-btn" id="uploadAvatarBtn">
+                            <i class="fas fa-upload"></i>
+                            <span>Upload Group Image</span>
+                        </button>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupName" class="form-label">Group Name</label>
+                    <input type="text" id="groupName" class="form-control" placeholder="Enter group name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupCategory" class="form-label">Category</label>
+                    <select id="groupCategory" class="form-control">
+                        <option value="">Select a category</option>
+                        <option value="hobbies">Hobbies & Interests</option>
+                        <option value="education">Education</option>
+                        <option value="technology">Technology</option>
+                        <option value="health">Health & Wellness</option>
+                        <option value="business">Business</option>
+                        <option value="entertainment">Entertainment</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupDescription" class="form-label">Description</label>
+                    <textarea id="groupDescription" class="form-control form-textarea" placeholder="What's this group about?"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupPrivacy" class="form-label">Privacy</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="privacy" value="public" checked>
+                            <span>Public (Anyone can join)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="privacy" value="private">
+                            <span>Private (Approval required)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelCreateGroupBtn">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="confirmCreateGroupBtn">
+                    Create Group
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const createGroupBtn = document.getElementById('createGroupBtn');
+            const createGroupModal = document.getElementById('createGroupModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelCreateGroupBtn = document.getElementById('cancelCreateGroupBtn');
+            const confirmCreateGroupBtn = document.getElementById('confirmCreateGroupBtn');
+            const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
+            const avatarInput = document.getElementById('avatarInput');
+            const avatarPreview = document.getElementById('avatarPreview');
+            const previewButtons = document.querySelectorAll('.preview-btn');
+            const joinButtons = document.querySelectorAll('.join-btn');
+            const activeGroup = document.getElementById('activeGroup');
+            const closeGroupBtn = document.getElementById('closeGroupBtn');
+            const activeGroupTitle = document.getElementById('activeGroupTitle');
+            const chatMessages = document.getElementById('chatMessages');
+            const messageInput = document.getElementById('messageInput');
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            const chatBtn = document.getElementById('chatBtn');
+            const audioCallBtn = document.getElementById('audioCallBtn');
+            const videoCallBtn = document.getElementById('videoCallBtn');
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Sample messages data
+            const sampleMessages = [
+                {
+                    sender: "Alex Johnson",
+                    avatar: "https://source.unsplash.com/random/100x100/?man",
+                    message: "Hey everyone! Welcome to our group chat.",
+                    time: "10:30 AM",
+                    sent: false
+                },
+                {
+                    sender: "Maria Garcia",
+                    avatar: "https://source.unsplash.com/random/100x100/?woman",
+                    message: "Thanks for creating this group! I'm excited to be here.",
+                    time: "10:32 AM",
+                    sent: false
+                },
+                {
+                    sender: "You",
+                    avatar: "",
+                    message: "Happy to have you all here! Let's make this an awesome community.",
+                    time: "10:35 AM",
+                    sent: true
+                },
+                {
+                    sender: "Sam Wilson",
+                    avatar: "https://source.unsplash.com/random/100x100/?person",
+                    message: "Does anyone want to join the event this weekend?",
+                    time: "10:40 AM",
+                    sent: false
+                }
+            ];
+            
+            // Toggle create group modal
+            createGroupBtn.addEventListener('click', () => {
+                createGroupModal.classList.add('active');
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                createGroupModal.classList.remove('active');
+            });
+            
+            cancelCreateGroupBtn.addEventListener('click', () => {
+                createGroupModal.classList.remove('active');
+            });
+            
+            // Handle avatar upload
+            uploadAvatarBtn.addEventListener('click', () => {
+                avatarInput.click();
+            });
+            
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        avatarPreview.innerHTML = `<img src="${event.target.result}" alt="Group avatar">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Create new group
+            confirmCreateGroupBtn.addEventListener('click', () => {
+                const groupName = document.getElementById('groupName').value;
+                const groupDescription = document.getElementById('groupDescription').value;
+                
+                if (!groupName || !groupDescription) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // In a real app, you would send this data to your backend
+                console.log('Creating group:', {
+                    name: groupName,
+                    description: groupDescription,
+                    category: document.getElementById('groupCategory').value,
+                    privacy: document.querySelector('input[name="privacy"]:checked').value,
+                    avatar: avatarPreview.querySelector('img')?.src || ''
+                });
+                
+                // Show success message and close modal
+                alert('Group created successfully!');
+                createGroupModal.classList.remove('active');
+                
+                // Reset form
+                document.getElementById('groupName').value = '';
+                document.getElementById('groupDescription').value = '';
+                document.getElementById('groupCategory').value = '';
+                avatarPreview.innerHTML = '<div class="avatar-placeholder"><i class="fas fa-camera"></i></div>';
+            });
+            
+            // Preview group
+            previewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const groupCard = this.closest('.group-card');
+                    const groupTitle = groupCard.querySelector('.group-title').textContent;
+                    
+                    // Set active group title
+                    activeGroupTitle.textContent = groupTitle;
+                    
+                    // Show active group section
+                    activeGroup.style.display = 'block';
+                    
+                    // Load sample messages
+                    loadMessages();
+                });
+            });
+            
+            // Join group
+            joinButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const groupCard = this.closest('.group-card');
+                    const groupId = groupCard.dataset.groupId;
+                    
+                    // Change button to "Joined"
+                    this.innerHTML = '<i class="fas fa-check"></i><span>Joined</span>';
+                    this.disabled = true;
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-outline');
+                    
+                    // In a real app, you would send a request to join the group
+                    console.log(`Joined group ${groupId}`);
+                });
+            });
+            
+            // Close active group
+            closeGroupBtn.addEventListener('click', () => {
+                activeGroup.style.display = 'none';
+            });
+            
+            // Send message
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText) {
+                    // Add message to chat
+                    addMessage({
+                        sender: "You",
+                        avatar: "",
+                        message: messageText,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        sent: true
+                    });
+                    
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // Simulate reply after 1-3 seconds
+                    setTimeout(() => {
+                        const replies = [
+                            "That's a great point!",
+                            "I agree with you.",
+                            "Thanks for sharing!",
+                            "Let me think about that...",
+                            "Interesting perspective!"
+                        ];
+                        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                        
+                        addMessage({
+                            sender: sampleMessages[Math.floor(Math.random() * sampleMessages.length)].sender,
+                            avatar: sampleMessages[Math.floor(Math.random() * sampleMessages.length)].avatar,
+                            message: randomReply,
+                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            sent: false
+                        });
+                    }, 1000 + Math.random() * 2000);
+                }
+            }
+            
+            sendMessageBtn.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Load sample messages
+            function loadMessages() {
+                chatMessages.innerHTML = '';
+                sampleMessages.forEach(msg => {
+                    addMessage(msg);
+                });
+            }
+            
+            // Add message to chat
+            function addMessage(msg) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'fade-in');
+                messageElement.classList.add(msg.sent ? 'sent' : 'received');
+                
+                messageElement.innerHTML = `
+                    <div class="message-avatar">
+                        ${msg.avatar ? `<img src="${msg.avatar}" alt="${msg.sender}">` : 'JS'}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">${msg.message}</div>
+                        <div class="message-info">
+                            <span>${msg.sender}</span>
+                            <span>•</span>
+                            <span>${msg.time}</span>
+                        </div>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Media buttons
+            chatBtn.addEventListener('click', () => {
+                alert('Opening group chat');
+            });
+            
+            audioCallBtn.addEventListener('click', () => {
+                alert('Starting audio call with group members');
+            });
+            
+            videoCallBtn.addEventListener('click', () => {
+                alert('Starting video call with group members');
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM Elements
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        const createGroupModal = document.getElementById('createGroupModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelCreateGroupBtn = document.getElementById('cancelCreateGroupBtn');
+        const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
+        const groupImageInput = document.getElementById('groupImage');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const previewButtons = document.querySelectorAll('.preview-btn');
+        const joinButtons = document.querySelectorAll('.join-btn');
+        const joinedButtons = document.querySelectorAll('.joined-btn');
+        const activeGroup = document.getElementById('activeGroup');
+        const groupSearch = document.getElementById('groupSearch');
+        const groupForm = document.getElementById('groupForm');
+
+        // Toggle create group modal
+        createGroupBtn.addEventListener('click', () => {
+            createGroupModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        function closeModal() {
+            createGroupModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelCreateGroupBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking outside
+        createGroupModal.addEventListener('click', (e) => {
+            if (e.target === createGroupModal) {
+                closeModal();
+            }
+        });
+        
+        // Handle avatar upload preview
+        uploadAvatarBtn.addEventListener('click', () => {
+            groupImageInput.click();
+        });
+        
+        groupImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('File size should be less than 5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    avatarPreview.innerHTML = `<img src="${event.target.result}" alt="Group avatar preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Join group functionality
+        joinButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const groupId = this.dataset.groupId;
+                joinGroup(groupId, this);
+            });
+        });
+        
+        function joinGroup(groupId, button) {
+            // Simulate API call with setTimeout
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Joining...</span>';
+            
+            setTimeout(() => {
+                // Update button to show joined state
+                button.innerHTML = '<i class="fas fa-check"></i><span>Joined</span>';
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline');
+                button.disabled = true;
+                
+                // Update the preview button text
+                const groupCard = button.closest('.group-card');
+                const previewBtn = groupCard.querySelector('.preview-btn');
+                previewBtn.querySelector('span').textContent = 'Open';
+                
+                // Show success message
+                showToast('Successfully joined the group!');
+            }, 1000);
+        }
+        
+        // Preview/Open group functionality
+        previewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const groupId = this.dataset.groupId;
+                const isJoined = this.closest('.group-card').querySelector('.joined-btn') !== null;
+                
+                if (isJoined) {
+                    // Open group in active view
+                    openGroupView(groupId);
+                } else {
+                    // Show preview modal
+                    showGroupPreview(groupId);
+                }
+            });
+        });
+        
+        function openGroupView(groupId) {
+            // In a real app, this would fetch group data and populate the activeGroup div
+            activeGroup.innerHTML = `
+                <div style="padding: 20px;">
+                    <h2>Group Details for ID: ${groupId}</h2>
+                    <p>This would show the full group view with posts, members, etc.</p>
+                </div>
+            `;
+            activeGroup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function showGroupPreview(groupId) {
+            // In a real app, this would show a preview modal with group details
+            alert(`Showing preview for group ID: ${groupId}\nIn a real app, this would open a preview modal.`);
+        }
+        
+        // Group search functionality
+        groupSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const groupCards = document.querySelectorAll('.group-card');
+            
+            groupCards.forEach(card => {
+                const title = card.querySelector('.group-title').textContent.toLowerCase();
+                const description = card.querySelector('.group-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Form submission
+        groupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const groupName = document.getElementById('groupName').value;
+            const groupDescription = document.getElementById('groupDescription').value;
+            const privacy = document.querySelector('input[name="privacy"]:checked').value;
+            const groupImage = groupImageInput.files[0];
+            
+            // Validate form
+            if (!groupName.trim()) {
+                alert('Please enter a group name');
+                return;
+            }
+            
+            // Simulate form submission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            
+            setTimeout(() => {
+                // Show success message
+                showToast(`Group "${groupName}" created successfully!`);
+                
+                // Close modal and reset form
+                closeModal();
+                groupForm.reset();
+                avatarPreview.innerHTML = `
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <span>Group Image</span>
+                    </div>
+                `;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Create Group';
+                
+                // In a real app, you would add the new group to the UI
+            }, 1500);
+        });
+        
+        // Helper function to show toast messages
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.backgroundColor = 'var(--dark)';
+            toast.style.color = 'white';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = 'var(--radius-sm)';
+            toast.style.boxShadow = 'var(--shadow-md)';
+            toast.style.zIndex = '10000';
+            toast.style.animation = 'fadeIn 0.3s ease-in-out';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeIn 0.3s ease-in-out reverse';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Close active group view when clicking outside (simplified for demo)
+        activeGroup.addEventListener('click', function(e) {
+            if (e.target === activeGroup) {
+                activeGroup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+
+{% block title %}Groups{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styles for the groups page */
+    .groups-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Group card styles */
+    .group-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+
+    .group-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .group-cover {
+        height: 8rem;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .group-initial {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    /* Form styles */
+    .group-form input,
+    .group-form textarea,
+    .group-form select {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+    }
+
+    .group-form input:focus,
+    .group-form textarea:focus,
+    .group-form select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Privacy badges */
+    .privacy-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+    }
+
+    .privacy-public {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .privacy-private {
+        background-color: #ede9fe;
+        color: #5b21b6;
+    }
+
+    /* Empty state styles */
+    .empty-state {
+        padding: 2rem 0;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .group-cover {
+            height: 6rem;
+        }
+        
+        .group-initial {
+            font-size: 2rem;
+        }
+    }
+
+    /* Animation for loading */
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .loading-card {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 groups-container">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Main Content -->
+        <div class="w-full md:w-2/3">
+            <!-- Create Group Card -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Create a New Group</h2>
+                <form method="post" enctype="multipart/form-data" class="group-form">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="id_name">Group Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="id_description">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="id_privacy">Privacy</label>
+                                {{ form.privacy }}
+                                {% if form.privacy.errors %}
+                                    <p class="text-red-500 text-sm mt-1">{{ form.privacy.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="id_cover_image">Cover Image</label>
+                                {{ form.cover_image }}
+                                <div class="image-preview-container mt-2"></div>
+                                {% if form.cover_image.errors %}
+                                    <p class="text-red-500 text-sm mt-1">{{ form.cover_image.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                            Create Group
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Your Groups Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Your Groups</h2>
+                    <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+                        {{ user_groups.count }} groups
+                    </span>
+                </div>
+                
+                {% if user_groups %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% for group in user_groups %}
+                    <a href="{% url 'group_detail' group.id %}" class="group block rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-200 border border-gray-100 group-card">
+                        <div class="relative h-32 bg-gray-200 overflow-hidden group-cover">
+                            {% if group.cover_image %}
+                            <img src="{{ group.cover_image.url }}" alt="{{ group.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                <span class="text-white text-4xl font-bold group-initial">{{ group.name|first|upper }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                                    {{ group.members.count }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gray-800 group-hover:text-blue-600 transition duration-200">{{ group.name }}</h3>
+                            <p class="text-gray-600 text-sm mt-1 line-clamp-2">{{ group.description }}</p>
+                            <div class="flex items-center mt-3">
+                                <span class="text-xs px-2 py-1 rounded-full privacy-badge 
+                                    {% if group.privacy == 'public' %}privacy-public{% else %}privacy-private{% endif %}">
+                                    {{ group.get_privacy_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 empty-state">
+                    <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4 empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900">No groups yet</h3>
+                    <p class="mt-1 text-sm text-gray-500">Create your first group or join some recommended ones below.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recommended Groups Sidebar -->
+        <div class="w-full md:w-1/3">
+            <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Recommended Groups</h2>
+                
+                {% if recommended_groups %}
+                <div class="space-y-4">
+                    {% for group in recommended_groups %}
+                    <div class="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition duration-150">
+                        <div class="flex-shrink-0">
+                            {% if group.cover_image %}
+                            <img src="{{ group.cover_image.url }}" alt="{{ group.name }}" class="w-12 h-12 rounded-lg object-cover">
+                            {% else %}
+                            <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
+                                <span class="text-white font-bold">{{ group.name|first|upper }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-semibold text-gray-900 truncate">{{ group.name }}</h4>
+                            <div class="flex items-center mt-1">
+                                <span class="text-xs text-gray-500">{{ group.members.count }} members</span>
+                                <span class="mx-1 text-gray-300">•</span>
+                                <span class="text-xs text-gray-500 capitalize">{{ group.privacy }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="{% url 'group_detail' group.id %}" class="text-xs font-medium text-blue-600 hover:text-blue-800">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-6">
+                    <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center see-more-groups">
+                        See more recommendations
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-4 empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400 empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No recommendations</h3>
+                    <p class="mt-1 text-sm text-gray-500">We couldn't find any groups to recommend right now.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Group creation form handling
+        const groupForm = document.querySelector('.group-form');
+        if (groupForm) {
+            groupForm.addEventListener('submit', function(e) {
+                // Validate form before submission
+                const nameInput = document.getElementById('id_name');
+                if (nameInput && nameInput.value.trim() === '') {
+                    e.preventDefault();
+                    alert('Group name is required');
+                    nameInput.focus();
+                    return false;
+                }
+                
+                // Show loading state
+                const submitButton = groupForm.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Creating Group...
+                    `;
+                }
+            });
+        }
+
+        // Image preview for cover image upload
+        const coverImageInput = document.getElementById('id_cover_image');
+        if (coverImageInput) {
+            coverImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const previewContainer = document.querySelector('.image-preview-container');
+                        if (previewContainer) {
+                            previewContainer.innerHTML = `
+                                <img src="${event.target.result}" alt="Preview" class="h-32 w-full object-cover rounded-lg border">
+                                <p class="text-xs text-gray-500 mt-1">Image preview</p>
+                            `;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Toggle for showing more recommended groups
+        const seeMoreBtn = document.querySelector('.see-more-groups');
+        if (seeMoreBtn) {
+            seeMoreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                seeMoreBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading...
+                `;
+                
+                // Simulate API call (in a real app, this would fetch more groups)
+                setTimeout(() => {
+                    seeMoreBtn.innerHTML = 'See more recommendations';
+                    // Here you would typically append new groups to the list
+                }, 1500);
+            });
+        }
+
+        // Initialize tooltips for group cards
+        const groupCards = document.querySelectorAll('.group-card');
+        groupCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('ring-2', 'ring-blue-500');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('ring-2', 'ring-blue-500');
+            });
+        });
+
+        // Handle join group buttons (example functionality)
+        document.querySelectorAll('.join-group-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const groupId = this.dataset.groupId;
+                
+                fetch(`/groups/${groupId}/join/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.textContent = 'Joined';
+                        this.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                        this.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+chat group
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Chat-specific styles */
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0f2f5;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+            background-repeat: repeat;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .message.received {
+            justify-content: flex-start;
+        }
+        
+        .message.sent {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        
+        .message.sent .message-bubble {
+            background: #dcf8c6;
+            border-bottom-right-radius: 4px;
+            margin-left: auto;
+        }
+        
+        .message.received .message-bubble {
+            background: white;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #667781;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .message.sent .message-time {
+            justify-content: flex-end;
+        }
+        
+        .message-status {
+            margin-left: 4px;
+        }
+        
+        .message.sent .message-status {
+            color: #4fc3f7;
+        }
+        
+        .chat-input-container {
+            background: white;
+            padding: 10px;
+            border-top: 1px solid #e9edef;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            background: #f0f2f5;
+            margin: 0 8px;
+            outline: none;
+        }
+        
+        .send-button {
+            background: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+        
+        /* Animation for new messages */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .new-message {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 18px;
+            margin-bottom: 16px;
+            width: fit-content;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667781;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header p-4 flex items-center">
+            <button onclick="goBack()" class="mr-4 text-white">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="flex-1">
+                <h2 class="font-semibold text-lg">Group Chat</h2>
+                <p class="text-xs opacity-80" id="typing-indicator"></p>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-600">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chat-messages">
+            <!-- Date divider -->
+            <div class="text-center my-4">
+                <span class="bg-white px-3 py-1 rounded-full text-xs text-gray-500 shadow-sm">Today</span>
+            </div>
+            
+            <!-- Sample received message -->
+            <div class="message received">
+                <div class="message-bubble">
+                    <div class="message-text">Hey everyone! How's it going?</div>
+                    <div class="message-time">10:30 AM</div>
+                </div>
+            </div>
+            
+            <!-- Sample sent message -->
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">Pretty good! Just working on the project.</div>
+                    <div class="message-time">10:32 AM <i class="fas fa-check message-status"></i></div>
+                </div>
+            </div>
+            
+            <!-- Typing indicator -->
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <button class="text-gray-500 mx-2">
+                <i class="far fa-smile text-xl"></i>
+            </button>
+            <button class="text-gray-500">
+                <i class="fas fa-paperclip text-xl"></i>
+            </button>
+            <input type="text" class="chat-input" placeholder="Type a message" id="chat-input">
+            <button class="send-button" id="send-button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - replace with your actual data
+        const groupMembers = ['Alex', 'Jamie', 'Taylor'];
+        let isTyping = false;
+        
+        // Function to go back to groups list
+        function goBack() {
+            // Implement navigation back to groups
+            console.log("Going back to groups");
+        }
+        
+        // Function to add a new message to the chat
+        function addMessage(text, isSent = true) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isSent ? 'sent' : 'received'} new-message`;
+            messageElement.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">
+                        ${timeString}
+                        ${isSent ? '<i class="fas fa-check message-status"></i>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Simulate reply after 1-3 seconds
+            if (isSent) {
+                setTimeout(() => {
+                    simulateReply();
+                }, Math.random() * 2000 + 1000);
+            }
+        }
+        
+        // Function to simulate a reply from another group member
+        function simulateReply() {
+            if (isTyping) return;
+            
+            isTyping = true;
+            const typingIndicator = document.getElementById('typing-indicator');
+            const randomMember = groupMembers[Math.floor(Math.random() * groupMembers.length)];
+            typingIndicator.textContent = `${randomMember} is typing...`;
+            
+            // Show typing for 1-3 seconds before sending message
+            setTimeout(() => {
+                typingIndicator.textContent = '';
+                isTyping = false;
+                
+                const replies = [
+                    "That's great to hear!",
+                    "I'm working on it too",
+                    "Let's discuss this in our next meeting",
+                    "Can you share your progress?",
+                    "I'll send you the files soon"
+                ];
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                addMessage(randomReply, false);
+            }, Math.random() * 2000 + 1000);
+        }
+        
+        // Event listeners
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message);
+                input.value = '';
+            }
+        }
+        
+        // Initialize chat with some messages
+        window.onload = function() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Simulate initial activity
+            setTimeout(() => {
+                addMessage("Welcome to the group chat!", false);
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+
+<head>
+    <style>
+        #root {
+            width: 100vw;
+            height: 100vh;
+            }
+    </style>
+</head>
+
+
+<body>
+    <div id="root"></div>
+</body>
+<script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+<script>
+window.onload = function () {
+    function getUrlParams(url) {
+        let urlStr = url.split('?')[1];
+        const urlSearchParams = new URLSearchParams(urlStr);
+        const result = Object.fromEntries(urlSearchParams.entries());
+        return result;
+    }
+
+
+        // Generate a Token by calling a method.
+        // @param 1: appID
+        // @param 2: serverSecret
+        // @param 3: Room ID
+        // @param 4: User ID
+        // @param 5: Username
+    const roomID = getUrlParams(window.location.href)['roomID'] || (Math.floor(Math.random() * 10000) + "");
+    const userID = Math.floor(Math.random() * 10000) + "";
+    const userName = "{{ name}}" ;
+    const appID = 249916950;
+    const serverSecret = "f110401543660a079b14d92bfe3c3011";
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName);
+
+    
+        const zp = ZegoUIKitPrebuilt.create(kitToken);
+        zp.joinRoom({
+            container: document.querySelector("#root"),
+            sharedLinks: [{
+                name: 'Personal link',
+                url: window.location.protocol + '//' + window.location.host  + window.location.pathname + '?roomID=' + roomID,
+            }],
+            scenario: {
+                mode: ZegoUIKitPrebuilt.VideoConference,
+            },
+                
+           	turnOnMicrophoneWhenJoining: true,
+           	turnOnCameraWhenJoining: true,
+           	showMyCameraToggleButton: true,
+           	showMyMicrophoneToggleButton: true,
+           	showAudioVideoSettingsButton: true,
+           	showScreenSharingButton: true,
+           	showTextChat: true,
+           	showUserList: true,
+           	maxUsers: 50,
+           	layout: "Sidebar",
+           	showLayoutButton: true,
+         
+            });
+}
+</script>
+
+</html>

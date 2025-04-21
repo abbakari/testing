@@ -1,0 +1,98 @@
+<!-- core/templates/core/post_detail.html -->
+{% extends "base.html" %}
+
+{% block title %}Post by {{ post.user.username }}{% endblock %}
+
+{% block content %}
+<div class="post-detail-container">
+    <div class="post">
+        <div class="post-header">
+            <a href="{% url 'profile' post.user.username %}" class="post-user">
+                {% if post.user.profile_picture %}
+                <img src="{{ post.user.profile_picture.url }}" alt="{{ post.user.username }}" class="profile-pic-sm">
+                {% else %}
+                <span class="material-icons profile-pic-sm">account_circle</span>
+                {% endif %}
+                <span>{{ post.user.username }}</span>
+            </a>
+            <span class="post-time">{{ post.created_at|timesince }} ago</span>
+        </div>
+        
+        <div class="post-content">
+            <p>{{ post.content }}</p>
+            
+            {% if post.media_file %}
+                {% if post.media_type == 'image' %}
+                <div class="post-media">
+                    <img src="{{ post.media_file.url }}" alt="Post image">
+                </div>
+                {% elif post.media_type == 'video' %}
+                <div class="post-media">
+                    <video controls>
+                        <source src="{{ post.media_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                {% elif post.media_type == 'audio' %}
+                <div class="post-media">
+                    <audio controls>
+                        <source src="{{ post.media_file.url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="post-actions">
+            <a href="{% url 'like_post' post.id %}" class="post-action">
+                <span class="material-icons">
+                    {% if request.user in post.likes.all %}favorite{% else %}favorite_border{% endif %}
+                </span>
+                <span>{{ post.likes.count }}</span>
+            </a>
+            {% if post.user == request.user %}
+            <a href="{% url 'delete_post' post.id %}" class="post-action delete-post">
+                <span class="material-icons">delete</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="comments-section">
+        <h3>Comments</h3>
+        
+        <form method="POST" class="comment-form">
+            {% csrf_token %}
+            {{ form.content }}
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+        
+        <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-header">
+                    <a href="{% url 'profile' comment.user.username %}" class="comment-user">
+                        {% if comment.user.profile_picture %}
+                        <img src="{{ comment.user.profile_picture.url }}" alt="{{ comment.user.username }}" class="profile-pic-xs">
+                        {% else %}
+                        <span class="material-icons profile-pic-xs">account_circle</span>
+                        {% endif %}
+                        <span>{{ comment.user.username }}</span>
+                    </a>
+                    <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+                </div>
+                
+                <div class="comment-content">
+                    <p>{{ comment.content }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-comments">
+                <p>No comments yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

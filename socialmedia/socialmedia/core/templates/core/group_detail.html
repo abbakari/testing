@@ -1,0 +1,1239 @@
+
+{% load static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #6c5ce7;
+        --primary-dark: #5649c0;
+        --secondary: #00cec9;
+        --accent: #fd79a8;
+        --danger: #ff4757;
+        --warning: #fdcb6e;
+        --success: #00b894;
+        --dark: #2d3436;
+        --light: #f5f6fa;
+        --glass: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #dfe6e9 100%);
+        color: var(--dark);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Floating Particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .particle {
+        position: absolute;
+        background: var(--primary);
+        border-radius: 50%;
+        filter: blur(1px);
+        animation: float 15s infinite linear;
+        opacity: 0.6;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.6; }
+        90% { opacity: 0.6; }
+        100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+    }
+
+    /* Wave Effect */
+    .wave-container {
+        position: relative;
+        height: 150px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 200%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%236c5ce7" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%236c5ce7" opacity=".5"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%236c5ce7"/></svg>');
+        background-repeat: repeat-x;
+        background-position: 0 bottom;
+        background-size: 50% 100px;
+        animation: wave 15s linear infinite;
+    }
+
+    @keyframes wave {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    /* Main Container */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Post Styles */
+    .post-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(108, 92, 231, 0.15);
+    }
+
+    .post-header {
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .post-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+        border: 3px solid var(--primary);
+    }
+
+    .post-user {
+        flex: 1;
+    }
+
+    .post-username {
+        font-weight: 600;
+        margin-bottom: 3px;
+        color: var(--dark);
+    }
+
+    .post-time {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .post-actions {
+        position: relative;
+    }
+
+    .post-menu {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #888;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .post-menu:hover {
+        color: var(--primary);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        min-width: 150px;
+        z-index: 100;
+        display: none;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown-item:hover {
+        background: #f5f6fa;
+        color: var(--primary);
+    }
+
+    .dropdown-item i {
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .delete-item {
+        color: var(--danger);
+    }
+
+    .post-content {
+        padding: 20px;
+    }
+
+    .post-text {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .post-media {
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .post-image {
+        max-height: 500px;
+        object-fit: cover;
+    }
+
+    .post-video {
+        height: 400px;
+        background: #000;
+    }
+
+    .post-stats {
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        color: #666;
+        font-size: 14px;
+        border-bottom: 1px solid #f1f1f1;
+        padding-bottom: 10px;
+    }
+
+    .post-stat {
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .post-stat i {
+        margin-right: 5px;
+    }
+
+    .post-buttons {
+        display: flex;
+        padding: 10px 20px;
+    }
+
+    .post-button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .post-button:hover {
+        background: #f5f6fa;
+        color: var(--primary);
+    }
+
+    .post-button i {
+        margin-right: 8px;
+    }
+
+    .like-button.active {
+        color: var(--danger);
+    }
+
+    /* Comment Section */
+    .comments-section {
+        padding: 0 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .comments-section.show {
+        max-height: 1000px;
+        padding-bottom: 15px;
+    }
+
+    .comment-form {
+        display: flex;
+        margin-top: 15px;
+    }
+
+    .comment-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .comment-submit {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 0 20px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .comment-submit:hover {
+        background: var(--primary-dark);
+    }
+
+    .comment-list {
+        margin-top: 15px;
+    }
+
+    .comment {
+        display: flex;
+        margin-bottom: 15px;
+    }
+
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+
+    .comment-body {
+        flex: 1;
+        background: #f5f6fa;
+        padding: 10px 15px;
+        border-radius: 15px;
+    }
+
+    .comment-user {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+
+    .comment-text {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .comment-time {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* Modals */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #f1f1f1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #888;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    /* Create Post Form */
+    .create-post {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .post-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-input {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        outline: none;
+        font-family: 'Poppins', sans-serif;
+        resize: none;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .post-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .attachment-options {
+        display: flex;
+    }
+
+    .attachment-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #666;
+        margin-right: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .attachment-btn:hover {
+        color: var(--primary);
+    }
+
+    .post-submit {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 25px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .post-submit:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Media preview */
+    .media-preview {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .remove-media {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .wave-container {
+            height: 100px;
+        }
+        
+        .post-buttons {
+            flex-wrap: wrap;
+        }
+        
+        .post-button {
+            flex: 0 0 50%;
+            margin-bottom: 5px;
+        }
+        
+        .post-video {
+            height: 250px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="particles" id="particles"></div>
+
+<div class="wave-container">
+    <div class="wave"></div>
+</div>
+
+<div class="container">
+    <!-- Create Post -->
+    <div class="create-post">
+        <form class="post-form" id="createPostForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <textarea class="post-input" placeholder="What's on your mind?" id="postContent" required></textarea>
+            
+            <div id="mediaPreview" style="display: none;">
+                <div class="media-preview">
+                    <button type="button" class="remove-media" onclick="removeMedia()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img id="imagePreview" src="#" alt="Preview" class="post-media post-image" style="display: none;">
+                    <video id="videoPreview" controls class="post-media post-video" style="display: none;">
+                        <source id="videoSource" src="#" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+            
+            <div class="post-actions">
+                <div class="attachment-options">
+                    <label for="postImage" class="attachment-btn" title="Add Image">
+                        <i class="fas fa-image"></i>
+                        <input type="file" id="postImage" accept="image/*" style="display: none;">
+                    </label>
+                    <label for="postVideo" class="attachment-btn" title="Add Video">
+                        <i class="fas fa-video"></i>
+                        <input type="file" id="postVideo" accept="video/*" style="display: none;">
+                    </label>
+                </div>
+                <button type="submit" class="post-submit">Post</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Posts Feed -->
+    <div id="postsFeed">
+        {% for post in posts %}
+        <div class="post-card" id="post-{{ post.id }}">
+            <div class="post-header">
+                <img src="{{ post.user.profile_picture.url }}" alt="{{ post.user.username }}" class="post-avatar">
+                <div class="post-user">
+                    <div class="post-username">{{ post.user.username }}</div>
+                    <div class="post-time">{{ post.created_at|timesince }} ago</div>
+                </div>
+                {% if post.user == request.user %}
+                <div class="post-actions">
+                    <button class="post-menu" onclick="toggleDropdown(this)">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" onclick="editPost('{{ post.id }}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </div>
+                        <div class="dropdown-item delete-item" onclick="confirmDelete('{{ post.id }}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="post-content">
+                <div class="post-text">{{ post.content }}</div>
+                {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Post image" class="post-media post-image">
+                {% elif post.video %}
+                <video controls class="post-media post-video">
+                    <source src="{{ post.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
+            </div>
+            <div class="post-stats">
+                <div class="post-stat">
+                    <i class="fas fa-heart"></i> <span class="like-count">{{ post.likes.count }}</span>
+                </div>
+                
+                <div class="post-stat">
+                    <i class="fas fa-comment"></i> <span class="comment-count">{{ post.comments.count }}</span>
+                </div>
+            </div>
+            <div class="post-buttons">
+                <div class="post-button like-button {% if request.user in post.likes.all %}active{% endif %}" 
+                     onclick="toggleLike('{{ post.id }}', this)">
+                    <i class="fas fa-thumbs-up"></i> Like
+                </div>
+                <div class="post-button" onclick="toggleComments('{{ post.id }}', this)">
+                    <i class="fas fa-comment"></i> Comment
+                </div>
+                <div class="post-button" onclick="openShareModal('{{ post.id }}')">
+                    <i class="fas fa-share"></i> Share
+                </div>
+            </div>
+            <div class="comments-section" id="comments-{{ post.id }}">
+                <div class="comment-list" id="comment-list-{{ post.id }}">
+                    {% for comment in post.comments.all %}
+                    <div class="comment" id="comment-{{ comment.id }}">
+                        <img src="{{ comment.user.profile_picture.url }}" alt="{{ comment.user.username }}" class="comment-avatar">
+                        <div class="comment-body">
+                            <div class="comment-user">{{ comment.user.username }}</div>
+                            <div class="comment-text">{{ comment.content }}</div>
+                            <div class="comment-time">{{ comment.created_at|timesince }} ago</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <form class="comment-form" onsubmit="addComment('{{ post.id }}', event)">
+                    <input type="text" class="comment-input" placeholder="Write a comment..." required>
+                    <button type="submit" class="comment-submit">Post</button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="post-card" style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-newspaper" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
+            <h3 style="font-weight: 500; color: #888;">No posts yet</h3>
+            <p style="color: #aaa;">Be the first to share something!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Delete Post</div>
+            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px;">
+                <button class="action-btn" style="background: #f1f1f1;" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="action-btn delete-btn" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal" id="shareModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Share Post</div>
+            <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="share-option" onclick="shareOnSocial('facebook')">
+                <div class="share-icon share-facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="share-label">Share on Facebook</div>
+            </div>
+            <div class="share-option" onclick="shareOnSocial('twitter')">
+                <div class="share-icon share-twitter">
+                    <i class="fab fa-twitter"></i>
+                </div>
+                <div class="share-label">Share on Twitter</div>
+            </div>
+            <div class="share-option" onclick="shareOnSocial('linkedin')">
+                <div class="share-icon share-linkedin">
+                    <i class="fab fa-linkedin-in"></i>
+                </div>
+                <div class="share-label">Share on LinkedIn</div>
+            </div>
+            <div class="share-option" onclick="shareOnSocial('whatsapp')">
+                <div class="share-icon share-whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="share-label">Share on WhatsApp</div>
+            </div>
+            <div class="share-option" onclick="copyToClipboard()">
+                <div class="share-icon share-copy">
+                    <i class="fas fa-copy"></i>
+                </div>
+                <div class="share-label">Copy Link</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize particles
+    function initParticles() {
+        const container = document.getElementById('particles');
+        const particleCount = window.innerWidth < 768 ? 30 : 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random size between 2px and 6px
+            const size = Math.random() * 4 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            // Random animation duration and delay
+            const duration = Math.random() * 20 + 10;
+            const delay = Math.random() * 5;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+            
+            // Random color from a set of pastel colors
+            const colors = ['#6c5ce7', '#00cec9', '#fd79a8', '#a29bfe', '#74b9ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.background = color;
+            
+            container.appendChild(particle);
+        }
+    }
+
+    // Toggle dropdown menu
+    function toggleDropdown(button) {
+        const dropdown = button.nextElementSibling;
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            if (menu !== dropdown) menu.classList.remove('show');
+        });
+        dropdown.classList.toggle('show');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.post-actions')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    // Media preview handlers
+    document.getElementById('postImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('postVideo').value = '';
+            document.getElementById('videoPreview').style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('imagePreview').src = event.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('mediaPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('postVideo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('postImage').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('videoSource').src = event.target.result;
+                document.getElementById('videoPreview').style.display = 'block';
+                document.getElementById('mediaPreview').style.display = 'block';
+                document.getElementById('videoPreview').load();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Remove media preview
+    function removeMedia() {
+        document.getElementById('postImage').value = '';
+        document.getElementById('postVideo').value = '';
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('videoPreview').style.display = 'none';
+        document.getElementById('mediaPreview').style.display = 'none';
+    }
+
+    // Create new post with AJAX
+    document.getElementById('createPostForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const content = document.getElementById('postContent').value;
+        const imageInput = document.getElementById('postImage');
+        const videoInput = document.getElementById('postVideo');
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        if (imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+        } else if (videoInput.files[0]) {
+            formData.append('video', videoInput.files[0]);
+        }
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+        
+        fetch('{% url "create_post" %}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new post to the feed
+                const postsFeed = document.getElementById('postsFeed');
+                const emptyState = postsFeed.querySelector('.post-card:not([id^="post-"])');
+                
+                if (emptyState) {
+                    postsFeed.innerHTML = '';
+                }
+                
+                const newPost = createPostElement(data.post);
+                postsFeed.insertBefore(newPost, postsFeed.firstChild);
+                
+                // Reset form
+                document.getElementById('postContent').value = '';
+                removeMedia();
+            } else {
+                alert(data.error || 'Error creating post');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while creating the post');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Post';
+        });
+    });
+
+    // Create post element
+    function createPostElement(post) {
+        const postElement = document.createElement('div');
+        postElement.className = 'post-card';
+        postElement.id = `post-${post.id}`;
+        
+        let mediaHtml = '';
+        if (post.image) {
+            mediaHtml = `<img src="${post.image}" alt="Post image" class="post-media post-image">`;
+        } else if (post.video) {
+            mediaHtml = `
+                <video controls class="post-media post-video">
+                    <source src="${post.video}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `;
+        }
+        
+        postElement.innerHTML = `
+            <div class="post-header">
+                <img src="${post.user.profile_picture}" alt="${post.user.username}" class="post-avatar">
+                <div class="post-user">
+                    <div class="post-username">${post.user.username}</div>
+                    <div class="post-time">Just now</div>
+                </div>
+                ${post.user.id === {{ request.user.id }} ? `
+                <div class="post-actions">
+                    <button class="post-menu" onclick="toggleDropdown(this)">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" onclick="editPost('${post.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </div>
+                        <div class="dropdown-item delete-item" onclick="confirmDelete('${post.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            <div class="post-content">
+                <div class="post-text">${post.content}</div>
+                ${mediaHtml}
+            </div>
+            <div class="post-stats">
+                <div class="post-stat">
+                    <i class="fas fa-heart"></i> <span class="like-count">0</span>
+                </div>
+                <div class="post-stat">
+                    <i class="fas fa-comment"></i> <span class="comment-count">0</span>
+                </div>
+            </div>
+            <div class="post-buttons">
+                <div class="post-button like-button" onclick="toggleLike('${post.id}', this)">
+                    <i class="fas fa-thumbs-up"></i> Like
+                </div>
+                <div class="post-button" onclick="toggleComments('${post.id}', this)">
+                    <i class="fas fa-comment"></i> Comment
+                </div>
+                <div class="post-button" onclick="openShareModal('${post.id}')">
+                    <i class="fas fa-share"></i> Share
+                </div>
+            </div>
+            <div class="comments-section" id="comments-${post.id}">
+                <div class="comment-list" id="comment-list-${post.id}"></div>
+                <form class="comment-form" onsubmit="addComment('${post.id}', event)">
+                    <input type="text" class="comment-input" placeholder="Write a comment..." required>
+                    <button type="submit" class="comment-submit">Post</button>
+                </form>
+            </div>
+        `;
+        
+        return postElement;
+    }
+
+    // Toggle like on a post
+    function toggleLike(postId, button) {
+        const likeCount = button.closest('.post-card').querySelector('.like-count');
+        const icon = button.querySelector('i');
+        
+        fetch(`/posts/${postId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                likeCount.textContent = data.likes_count;
+                button.classList.toggle('active');
+                icon.classList.toggle('fas');
+                icon.classList.toggle('far');
+                
+                // Add animation effect
+                button.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 300);
+            }
+        });
+    }
+
+    // Toggle comments section
+    function toggleComments(postId, button) {
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        commentsSection.classList.toggle('show');
+    }
+
+    // Add comment to a post
+    function addComment(postId, event) {
+        event.preventDefault();
+        const input = event.target.querySelector('.comment-input');
+        const content = input.value.trim();
+        
+        if (!content) return;
+        
+        fetch(`/posts/${postId}/add_comment/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new comment to the list
+                const commentList = document.getElementById(`comment-list-${postId}`);
+                const newComment = document.createElement('div');
+                newComment.className = 'comment';
+                newComment.id = `comment-${data.comment.id}`;
+                newComment.innerHTML = `
+                    <img src="{{ request.user.profile_picture.url }}" alt="{{ request.user.username }}" class="comment-avatar">
+                    <div class="comment-body">
+                        <div class="comment-user">{{ request.user.username }}</div>
+                        <div class="comment-text">${data.comment.content}</div>
+                        <div class="comment-time">Just now</div>
+                    </div>
+                `;
+                commentList.appendChild(newComment);
+                
+                // Update comment count
+                const commentCount = document.querySelector(`#post-${postId} .comment-count`);
+                commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                
+                // Clear input
+                input.value = '';
+            }
+        });
+    }
+
+    // Delete post confirmation
+    let postToDelete = null;
+    
+    function confirmDelete(postId) {
+        postToDelete = postId;
+        document.getElementById('deleteModal').classList.add('show');
+    }
+    
+    // Actual delete function
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!postToDelete) return;
+        
+        const deleteBtn = this;
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        
+        fetch(`/posts/${postToDelete}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`post-${postToDelete}`).remove();
+                
+                // If no posts left, show empty state
+                const postsFeed = document.getElementById('postsFeed');
+                if (postsFeed.children.length === 0) {
+                    postsFeed.innerHTML = `
+                        <div class="post-card" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-newspaper" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
+                            <h3 style="font-weight: 500; color: #888;">No posts yet</h3>
+                            <p style="color: #aaa;">Be the first to share something!</p>
+                        </div>
+                    `;
+                }
+            }
+        })
+        .finally(() => {
+            closeModal('deleteModal');
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = 'Delete';
+            postToDelete = null;
+        });
+    });
+
+    // Share post modal
+    let postToShare = null;
+    
+    function openShareModal(postId) {
+        postToShare = postId;
+        document.getElementById('shareModal').classList.add('show');
+    }
+    
+    // Share on social media
+    function shareOnSocial(platform) {
+        const postUrl = `${window.location.origin}/posts/${postToShare}/`;
+        let shareUrl = '';
+        const postText = document.querySelector(`#post-${postToShare} .post-text`).textContent;
+        
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(postText)}&url=${encodeURIComponent(postUrl)}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodeURIComponent(`${postText} ${postUrl}`)}`;
+                break;
+        }
+        
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        }
+        closeModal('shareModal');
+    }
+
+    // Copy post link to clipboard
+    function copyToClipboard() {
+        const postUrl = `${window.location.origin}/posts/${postToShare}/`;
+        navigator.clipboard.writeText(postUrl)
+            .then(() => {
+                alert('Link copied to clipboard!');
+                closeModal('shareModal');
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy link');
+            });
+    }
+
+    // Edit post functionality
+    function editPost(postId) {
+        const postElement = document.getElementById(`post-${postId}`);
+        const postText = postElement.querySelector('.post-text').textContent;
+        const postImage = postElement.querySelector('.post-image');
+        const postVideo = postElement.querySelector('.post-video');
+        
+        // Create edit form
+        const editForm = document.createElement('div');
+        editForm.className = 'post-editor';
+        editForm.innerHTML = `
+            <textarea class="edit-textarea">${postText}</textarea>
+            <div class="edit-actions">
+                <button type="button" class="action-btn" onclick="cancelEdit('${postId}')">Cancel</button>
+                <button type="button" class="action-btn submit-btn" onclick="saveEdit('${postId}')">Save</button>
+            </div>
+        `;
+        
+        // Replace content with edit form
+        postElement.querySelector('.post-content').innerHTML = '';
+        postElement.querySelector('.post-content').appendChild(editForm);
+        
+        // Focus the textarea
+        editForm.querySelector('textarea').focus();
+    }
+
+    function cancelEdit(postId) {
+        // Reload the post to revert changes
+        fetch(`/posts/${postId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const postElement = document.getElementById(`post-${postId}`);
+                let mediaHtml = '';
+                if (data.image) {
+                    mediaHtml = `<img src="${data.image}" alt="Post image" class="post-media post-image">`;
+                } else if (data.video) {
+                    mediaHtml = `
+                        <video controls class="post-media post-video">
+                            <source src="${data.video}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                }
+                
+                postElement.querySelector('.post-content').innerHTML = `
+                    <div class="post-text">${data.content}</div>
+                    ${mediaHtml}
+                `;
+            });
+    }
+
+    function saveEdit(postId) {
+        const postElement = document.getElementById(`post-${postId}`);
+        const newContent = postElement.querySelector('.edit-textarea').value.trim();
+        
+        if (!newContent) {
+            alert('Post content cannot be empty');
+            return;
+        }
+        
+        fetch(`/posts/${postId}/edit/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: newContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let mediaHtml = '';
+                if (data.post.image) {
+                    mediaHtml = `<img src="${data.post.image}" alt="Post image" class="post-media post-image">`;
+                } else if (data.post.video) {
+                    mediaHtml = `
+                        <video controls class="post-media post-video">
+                            <source src="${data.post.video}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                }
+                
+                postElement.querySelector('.post-content').innerHTML = `
+                    <div class="post-text">${data.post.content}</div>
+                    ${mediaHtml}
+                `;
+            } else {
+                alert(data.error || 'Error updating post');
+            }
+        });
+    }
+
+    // Close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Initialize particles when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initParticles();
+        
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Prevent form submission on Enter key in textarea (allow Shift+Enter for new lines)
+    document.getElementById('postContent').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('createPostForm').dispatchEvent(new Event('submit'));
+        }
+    });
+</script>
+{% endblock %}

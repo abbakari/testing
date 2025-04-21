@@ -1,0 +1,118 @@
+<!-- core/templates/core/friends.html -->
+{% extends "base.html" %}
+
+{% block title %}Friends{% endblock %}
+
+{% block content %}
+<div class="friends-container">
+    <div class="friends-tabs">
+        <button class="tab-btn active" onclick="openTab('friends')">Friends</button>
+        <button class="tab-btn" onclick="openTab('requests')">Friend Requests</button>
+    </div>
+    
+    <div id="friends" class="tab-content active">
+        <h2>Your Friends</h2>
+        
+        {% if friends %}
+        <div class="friends-list">
+            {% for friend in friends %}
+            <div class="friend-card">
+                <a href="{% url 'profile' friend.username %}" class="friend-info">
+                    {% if friend.profile_picture %}
+                    <img src="{{ friend.profile_picture.url }}" alt="{{ friend.username }}" class="profile-pic-sm">
+                    {% else %}
+                    <span class="material-icons profile-pic-sm">account_circle</span>
+                    {% endif %}
+                    <span>{{ friend.username }}</span>
+                </a>
+                <a href="{% url 'remove_friend' friend.username %}" class="btn btn-secondary btn-sm">Remove</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-friends">
+            <p>You don't have any friends yet. Search for people to add them!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div id="requests" class="tab-content">
+        <div class="requests-section">
+            <h3>Incoming Requests</h3>
+            
+            {% if incoming_requests %}
+            <div class="requests-list">
+                {% for request in incoming_requests %}
+                <div class="request-card">
+                    <a href="{% url 'profile' request.from_user.username %}" class="request-info">
+                        {% if request.from_user.profile_picture %}
+                        <img src="{{ request.from_user.profile_picture.url }}" alt="{{ request.from_user.username }}" class="profile-pic-sm">
+                        {% else %}
+                        <span class="material-icons profile-pic-sm">account_circle</span>
+                        {% endif %}
+                        <span>{{ request.from_user.username }}</span>
+                    </a>
+                    <div class="request-actions">
+                        <a href="{% url 'accept_friend_request' request.id %}" class="btn btn-primary btn-sm">Accept</a>
+                        <a href="{% url 'reject_friend_request' request.id %}" class="btn btn-secondary btn-sm">Reject</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-requests">
+                <p>No incoming friend requests.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="requests-section">
+            <h3>Outgoing Requests</h3>
+            
+            {% if outgoing_requests %}
+            <div class="requests-list">
+                {% for request in outgoing_requests %}
+                <div class="request-card">
+                    <a href="{% url 'profile' request.to_user.username %}" class="request-info">
+                        {% if request.to_user.profile_picture %}
+                        <img src="{{ request.to_user.profile_picture.url }}" alt="{{ request.to_user.username }}" class="profile-pic-sm">
+                        {% else %}
+                        <span class="material-icons profile-pic-sm">account_circle</span>
+                        {% endif %}
+                        <span>{{ request.to_user.username }}</span>
+                    </a>
+                    <div class="request-actions">
+                        <a href="{% url 'cancel_friend_request' request.id %}" class="btn btn-secondary btn-sm">Cancel</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-requests">
+                <p>No outgoing friend requests.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function openTab(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show the selected tab content
+    document.getElementById(tabId).classList.add('active');
+    
+    // Add active class to the clicked button
+    event.currentTarget.classList.add('active');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,442 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmaryZooh - Social Network</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+     <style>
+        /* Animated Text Styles */
+        .animated-headline {
+            font-size: 2.5rem;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            min-height: 120px; /* Prevent layout shift */
+        }
+        
+        .animated-words {
+            display: inline-block;
+            position: relative;
+            text-align: left;
+        }
+        
+        .animated-words span {
+            position: absolute;
+            opacity: 0;
+            overflow: hidden;
+            color: #6200ee;
+            animation: rotateWord 12s linear infinite 0s;
+        }
+        
+        .animated-words span:nth-child(2) {
+            animation-delay: 3s;
+            color: #03dac6;
+        }
+        
+        .animated-words span:nth-child(3) {
+            animation-delay: 6s;
+            color: #ff0266;
+        }
+        
+        .animated-words span:nth-child(4) {
+            animation-delay: 9s;
+            color: #7c4dff;
+        }
+        
+        @keyframes rotateWord {
+            0% { opacity: 0; transform: translateY(20px); }
+            2% { opacity: 1; transform: translateY(0px); }
+            18% { opacity: 1; transform: translateY(0px); }
+            20% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 0; }
+        }
+        
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 77px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(25px, 9999px, 145px, 0); }
+            20% { clip: rect(129px, 9999px, 52px, 0); }
+            30% { clip: rect(60px, 9999px, 87px, 0); }
+            40% { clip: rect(60px, 9999px, 130px, 0); }
+            50% { clip: rect(120px, 9999px, 76px, 0); }
+            60% { clip: rect(35px, 9999px, 87px, 0); }
+            70% { clip: rect(87px, 9999px, 140px, 0); }
+            80% { clip: rect(20px, 9999px, 26px, 0); }
+            90% { clip: rect(86px, 9999px, 36px, 0); }
+            100% { clip: rect(91px, 9999px, 98px, 0); }
+        }
+        
+        /* Gradient Pulse Effect */
+        .gradient-pulse {
+            background: linear-gradient(90deg, #6200ee, #03dac6, #ff0266, #7c4dff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientPulse 8s ease infinite;
+        }
+        
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Video Container Styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(98, 0, 238, 0.2) 0%, rgba(3, 218, 198, 0.2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-button {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .play-button .material-icons {
+            font-size: 2rem;
+            color: #6200ee;
+        }
+    </style> 
+</head>
+<body>
+    <!-- Loading Screen with Compact Logo -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <span>A</span>
+                </div>
+                <h1 class="logo-text">AmaryZooh</h1>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Landing Content -->
+    <div class="landing-container" id="landingContent">
+        <!-- Animated Background Elements -->
+        <div class="floating-elements">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
+        
+        <div class="landing-content">
+            <!-- Compact Main Header -->
+            <div class="main-header">
+                <div class="logo">
+                    <div class="logo-mark">
+                        <span>A</span>
+                    </div>
+                    <h1 class="glitch" data-text="AmaryZooh">AmaryZooh</h1>
+                </div>
+                <p class="tagline gradient-pulse">Your social experience reimagined</p>
+            </div>
+            
+            <!-- Hero Section with Video -->
+            <div class="hero-section">
+                <div class="hero-text">
+                    <h2 class="animated-headline">
+                        <span>Connect with</span>
+                        <div class="animated-words">
+                            <span>friends</span>
+                            <span>colleagues</span>
+                            <span>communities</span>
+                            <span>the world</span>
+                        </div>
+                        <br>
+                        <span>and share your</span>
+                        <div class="animated-words">
+                            <span>world</span>
+                            <span>passions</span>
+                            <span>stories</span>
+                            <span>moments</span>
+                        </div>
+                    </h2>
+                    <p>Join our growing community of users who are sharing their moments and making connections.</p>
+                    <div class="cta-buttons">
+                        <a href="{% url 'register'%}" class="cta-button primary">
+                            <span>Sign Up Free</span>
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                        <a href="{%url  'login'%}" class="cta-button secondary">
+                            <span>Existing User</span>
+                            <span class="material-icons">login</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="video-container">
+                        <video id="heroVideo" muted loop>
+                            <source src="/static/video/home.mp4.mp4" type="video/mp4" > 
+                            <!-- Fallback image if video doesn't load -->
+                            <img src="{% static 'images/home.jpg' %}" alt="Hero Image">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-button" id="playButton">
+                                <span class="material-icons">play_arrow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="features-section">
+                <h3>Why choose AmaryZooh?</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <span class="material-icons">groups</span>
+                        </div>
+                        <h4>Real Connections</h4>
+                        <p>Build meaningful relationships with people who share your interests.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <span class="material-icons">photo_library</span>
+                        </div>
+                        <h4>Share Moments</h4>
+                        <p>Post photos, videos, and stories with your network.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <span class="material-icons">bolt</span>
+                        </div>
+                        <h4>Lightning Fast</h4>
+                        <p>Our platform is optimized for speed and performance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Loading screen animation
+        setTimeout(function() {
+            document.getElementById('loadingScreen').classList.add('fade-out');
+            
+            setTimeout(function() {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('landingContent').style.display = 'block';
+                
+                // Animate floating elements
+                const circles = document.querySelectorAll('.circle');
+                circles.forEach((circle, index) => {
+                    circle.style.animation = `float ${3 + index}s ease-in-out infinite`;
+                });
+                
+            }, 500);
+        }, 2000);
+        
+        // Video controls
+        const heroVideo = document.getElementById('heroVideo');
+        const playButton = document.getElementById('playButton');
+        const videoOverlay = document.querySelector('.video-overlay');
+        
+        // Autoplay the muted video
+        heroVideo.play().catch(error => {
+            console.log('Autoplay prevented:', error);
+        });
+        
+        // Play/pause toggle
+        playButton.addEventListener('click', function() {
+            if (heroVideo.paused) {
+                heroVideo.play();
+                videoOverlay.style.display = 'none';
+            } else {
+                heroVideo.pause();
+                videoOverlay.style.display = 'flex';
+            }
+        });
+        
+        // Hide overlay when video starts playing
+        heroVideo.addEventListener('play', function() {
+            videoOverlay.style.display = 'none';
+        });
+        
+        // Show overlay when video pauses
+        heroVideo.addEventListener('pause', function() {
+            videoOverlay.style.display = 'flex';
+        });
+        
+        // Text animation effects
+        const animatedWords = document.querySelectorAll('.animated-words');
+        animatedWords.forEach(words => {
+            const spans = words.querySelectorAll('span');
+            let current = 0;
+            
+            // Initial setup
+            spans[current].style.opacity = '1';
+            
+            // Rotate words continuously
+            setInterval(() => {
+                spans[current].style.opacity = '0';
+                current = (current + 1) % spans.length;
+                spans[current].style.opacity = '1';
+            }, 3000);
+        });
+        
+        // Glitch effect for the logo
+        const glitch = document.querySelector('.glitch');
+        setInterval(() => {
+            glitch.classList.add('glitch-active');
+            setTimeout(() => {
+                glitch.classList.remove('glitch-active');
+            }, 200);
+        }, 5000);
+    });
+    </script>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-mark">
+                        <span>A</span>
+                    </div>
+                    <h3>AmaryZooh</h3>
+                </div>
+                <p class="footer-tagline">Connecting people through shared experiences</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><span class="material-icons">facebook</span></a>
+                    <a href="#" aria-label="Twitter"><span class="material-icons">twitter</span></a>
+                    <a href="#" aria-label="Instagram"><span class="material-icons">instagram</span></a>
+                    <a href="#" aria-label="LinkedIn"><span class="material-icons">linkedin</span></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Guidelines</a></li>
+                        <li><a href="#">Privacy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Features</h4>
+                    <ul>
+                        <li><a href="#">Messaging</a></li>
+                        <li><a href="#">Groups</a></li>
+                        <li><a href="#">Stories</a></li>
+                        <li><a href="#">Events</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-container">
+                <p>&copy; 2023 AmaryZooh. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
